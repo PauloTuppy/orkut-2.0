@@ -1,20 +1,29 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+# Build stage
+FROM node:20-alpine AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the working directory
+# Copy package files
 COPY package*.json ./
 
-# Install any needed dependencies
-RUN npm install
+# Install dependencies
+RUN npm ci
 
-# Copy the content of the local src directory to the working directory
+# Copy application
 COPY . .
 
-# Build the application
+# Build for production
 RUN npm run build
 
-# Command to run the application
-CMD ["npm", "run", "preview"]
+# Production stage
+FROM nginx:alpine
+
+# Copy built assets from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

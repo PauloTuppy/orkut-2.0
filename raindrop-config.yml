@@ -1,0 +1,79 @@
+# Raindrop MCP Configuration for Orkut 2.0
+
+# This file outlines the desired configuration for Raindrop MCP to orchestrate
+# the build, deployment, and infrastructure management of the Orkut 2.0 project.
+# The specific syntax and available options should be replaced with actual
+# Raindrop MCP configuration as per its documentation.
+
+project:
+  name: "Orkut 2.0"
+  description: "The platform Meta should have built, orchestrated by Raindrop MCP."
+
+services:
+  backend:
+    name: "orkut-backend"
+    path: "./backend"
+    language: "Python"
+    framework: "FastAPI"
+    # Raindrop MCP's SmartSQL will manage the database schema and migrations
+    database:
+      type: "PostgreSQL"
+      managed_by: "SmartSQL" # SmartSQL will handle schema, PII detection, migrations, indexing, retention
+    cache:
+      type: "Redis"
+    # Environment variables and secrets would be managed by Raindrop MCP
+    # Example:
+    # environment:
+    #   DATABASE_URL: ${RAINDROP_SECRET_STAGING_DATABASE_URL}
+    #   REDIS_URL: ${RAINDROP_SECRET_STAGING_REDIS_URL}
+    #   JWT_SECRET: ${RAINDROP_SECRET_JWT_SECRET}
+    #   GOOGLE_GEMINI_API_KEY: ${RAINDROP_SECRET_GOOGLE_GEMINI_API_KEY}
+    #   ENVIRONMENT: "staging"
+
+  frontend:
+    name: "orkut-frontend"
+    path: "./frontend"
+    language: "TypeScript"
+    framework: "React"
+    # Environment variables and secrets would be managed by Raindrop MCP
+    # Example:
+    # environment:
+    #   VITE_API_URL: ${RAINDROP_SERVICE_ORKUT_BACKEND_URL}
+
+deployment:
+  provider: "Google Cloud Run"
+  region: "us-central1"
+  # Raindrop MCP will handle the automatic stages:
+  # 1. Requirements Analysis
+  # 2. Architecture Design
+  # 3. Database Schema (via SmartSQL)
+  # 4. Code Generation (via Gemini contextual)
+  # 5. Testing (pytest + vitest)
+  # 6. Infrastructure Setup (Raindrop provisiona)
+  # 7. Deployment (Cloud Run)
+  # 8. Monitoring Setup (Sentry + Logging)
+
+  environments:
+    staging:
+      # Configuration specific to staging environment
+      # e.g., resource limits, scaling, custom domains
+      backend_service_name: "orkut-backend-staging"
+      frontend_service_name: "orkut-frontend-staging"
+    production:
+      # Configuration specific to production environment
+      # e.g., resource limits, scaling, custom domains
+      backend_service_name: "orkut-backend"
+      frontend_service_name: "orkut-frontend"
+
+# Secrets management would be integrated with Raindrop MCP's secure storage
+# This section is conceptual and depends on Raindrop MCP's actual implementation.
+secrets:
+  # Define secrets that Raindrop MCP should manage and inject into services
+  - name: "STAGING_DATABASE_URL"
+  - name: "PRODUCTION_DATABASE_URL"
+  - name: "STAGING_REDIS_URL"
+  - name: "PRODUCTION_REDIS_URL"
+  - name: "JWT_SECRET"
+  - name: "GOOGLE_GEMINI_API_KEY"
+  - name: "SLACK_WEBHOOK"
+  # Add any other secrets required by the application

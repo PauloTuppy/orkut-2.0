@@ -1,21 +1,155 @@
 version: '3.8'
 
 services:
+  # ============================================================================
+  # PostgreSQL Database
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: orkut-postgres
+    environment:
+      POSTGRES_DB: orkut
+      POSTGRES_USER: orkut_user
+      POSTGRES_PASSWORD: orkut_password
+      POSTGRES_INITDB_ARGS: "-c shared_buffers=256MB -c effective_cache_size=1GB"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orkut_user -d orkut"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - orkut-network
+    restart: unless-stopped
+
+  # ============================================================================
+  # KeyDB Cache (Redis-compatible, multithreaded)
+  # ============================================================================
+  keydb:
+    image: eqalpha/keydb:latest
+    container_name: orkut-keydb
+    ports:
+      - "6380:6379"
+    command: >
+      keydb-server
+      --port 6379
+      --server-threads 4
+      --server-thread-affinity true
+      --active-client-balancing yes
+      --tcp-backlog 511
+      --timeout 300
+      --databases 16
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync everysec
+    volumes:
+      - keydb_data:/data
+    healthcheck:
+      test: ["CMD", "keydb-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - orkut-network
+    restart: unless-stopped
+
+  # ============================================================================
+  # Backend (FastAPI + Python)
+  # ============================================================================
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: orkut-backend
     ports:
       - "8000:8000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://orkut_user:orkut_password@postgres:5432/orkut
+      
+      # Cache (KeyDB is Redis-compatible!)
+      REDIS_URL: redis://keydb:6379/0
+      CACHE_ENABLED: "true"
+      
+      # Application
+      JWT_SECRET: dev-secret-change-in-production
+      GOOGLE_GEMINI_API_KEY: ${GOOGLE_GEMINI_API_KEY}
+      ENVIRONMENT: development
+      DEBUG: "true"
+      
+      # Security
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      
+      # SmartSQL + SmartMemory (preparado para depois)
+      SMART_SQL_ENABLED: "true"
+      SMART_MEMORY_ENABLED: "false"  # Ativar semana 3
+      
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keydb:
+        condition: service_healthy
     volumes:
       - ./backend:/app
-    env_file:
-      - ./.env
+      - /app/__pycache__
+      - /app/.pytest_cache
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    networks:
+      - orkut-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  # ============================================================================
+  # Frontend (React + Vite)
+  # ============================================================================
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: orkut-frontend
     ports:
       - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_ENV: development
+    depends_on:
+      - backend
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    depends_on:
-      - backend
+      - /app/.vite
+    command: npm run dev -- --host 0.0.0.0
+    networks:
+      - orkut-network
+    restart: unless-stopped
+
+# ============================================================================
+# Volumes (Persistência de dados)
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  keydb_data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  orkut-network:
+    driver: bridge
