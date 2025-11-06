@@ -15,7 +15,7 @@ export const VoiceAgent: React.FC<VoiceAgentProps> = ({
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string>('');
 
-  const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL || 'wss://orkut-2-0-xxxxx.livekit.cloud';
+  const LIVEKIT_URL = (import.meta.env?.VITE_LIVEKIT_URL as string) || 'wss://orkut-2-0-xxxxx.livekit.cloud';
 
   useEffect(() => {
     // Get LiveKit token from backend
@@ -136,7 +136,7 @@ const VoiceAgentUI: React.FC = () => {
           {state === 'listening' && '🎤 Listening...'}
           {state === 'thinking' && '🤔 Processing...'}
           {state === 'speaking' && '🗣️ Speaking...'}
-          {state === 'idle' && '💬 Start speaking to interact'}
+          {!state || state === 'idle' ? '💬 Start speaking to interact' : null}
         </div>
       </div>
 
