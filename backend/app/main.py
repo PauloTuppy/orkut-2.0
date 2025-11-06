@@ -54,6 +54,41 @@ app.add_middleware(
 app.add_middleware(RateLimitMiddleware, requests_per_minute=60)
 app.add_middleware(LoginRateLimitMiddleware, max_attempts=5)
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    logger.info("🚀 Initializing Orkut 2.0 API services...")
+    
+    # Initialize Cerebras
+    try:
+        from app.config import settings
+        from app.services import cerebras_service as cs_module
+        
+        if settings.CEREBRAS_API_KEY:
+            cs_module.cerebras_service = cs_module.CerebrasService(
+                api_key=settings.CEREBRAS_API_KEY,
+                model=settings.CEREBRAS_MODEL
+            )
+            await cs_module.cerebras_service.initialize()
+        else:
+            logger.warning("⚠️  Cerebras API key not configured")
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize Cerebras: {e}")
+    
+    logger.info("✅ Services initialization complete")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Close services on shutdown"""
+    logger.info("🛑 Shutting down API...")
+    
+    try:
+        from app.services import cerebras_service as cs_module
+        if cs_module.cerebras_service:
+            await cs_module.cerebras_service.close()
+    except:
+        pass
+
 @app.get("/health")
 async def health():
     return {
@@ -90,6 +125,14 @@ try:
     app.include_router(feeds.router, prefix="/api/feeds", tags=["feeds"])
 except ImportError as e:
     logger.warning(f"Could not import routes: {e}")
+
+# Import AI routes
+try:
+    from app.api import ai
+    app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
+    logger.info("✅ AI routes loaded")
+except ImportError as e:
+    logger.warning(f"Could not import AI routes: {e}")
 
 # Try to import agents (optional)
 try:
