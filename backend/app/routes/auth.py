@@ -23,7 +23,7 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-@router.post("/auth/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse)
 async def login(credentials: LoginRequest):
     """
     Login endpoint
@@ -39,7 +39,7 @@ async def login(credentials: LoginRequest):
     raise HTTPException(status_code=401, detail="Email ou senha inválidos")
 
 
-@router.post("/auth/register", response_model=TokenResponse)
+@router.post("/register", response_model=TokenResponse)
 async def register(user: RegisterRequest):
     """
     Register endpoint
@@ -51,7 +51,7 @@ async def register(user: RegisterRequest):
     )
 
 
-@router.get("/auth/me")
+@router.get("/me")
 async def get_current_user():
     """
     Get current user
@@ -63,7 +63,7 @@ async def get_current_user():
     }
 
 
-@router.post("/auth/logout")
+@router.post("/logout")
 async def logout():
     """
     Logout endpoint
