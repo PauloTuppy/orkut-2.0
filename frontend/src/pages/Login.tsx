@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, AlertCircle, Loader } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Loader, Eye, EyeOff } from 'lucide-react';
+import './Login.css';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('demo@orkut.com');
+  const [password, setPassword] = useState('demo123');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,7 +32,10 @@ export default function Login() {
 
       const data = await response.json();
       localStorage.setItem('access_token', data.access_token);
-      navigate('/');
+      
+      // Efeito de sucesso
+      setError('');
+      setTimeout(() => navigate('/'), 500);
     } catch (err: any) {
       setError(err.message || 'Erro ao fazer login');
     } finally {
@@ -39,145 +44,265 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orkut-blue via-orkut-blue-light to-orkut-pink flex items-center justify-center p-4">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
+    <div className="login-container">
+      {/* ============================================================
+          BACKGROUND ORKUT (Padrão azul + rosa)
+          ============================================================ */}
+      <div className="orkut-bg">
         <motion.div
           animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 360]
+            scale: [1, 1.05, 1],
+            rotate: [0, 5, -5, 0]
           }}
-          transition={{ duration: 20, repeat: Infinity }}
-          className="absolute top-10 left-10 w-40 h-40 bg-white opacity-5 rounded-full"
-        />
-        <motion.div
-          animate={{
-            scale: [1.1, 1, 1.1],
-            rotate: [360, 0]
-          }}
-          transition={{ duration: 20, repeat: Infinity }}
-          className="absolute bottom-10 right-10 w-60 h-60 bg-white opacity-5 rounded-full"
-        />
+          transition={{ duration: 15, repeat: Infinity }}
+          className="orkut-logo-bg"
+        >
+          O
+        </motion.div>
+        {/* Padrão de fundo Orkut */}
+        <div className="orkut-pattern" />
       </div>
 
-      {/* Login Card */}
+      {/* ============================================================
+          MSN CHARACTERS (Personagens flutuantes)
+          ============================================================ */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-md"
+        initial={{ x: -100, y: 100 }}
+        animate={{ x: 20, y: 0 }}
+        transition={{ duration: 2 }}
+        className="msn-character msn-char-left"
+        title="Saudade dos bonequinhos do MSN!"
       >
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <motion.h1
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              className="text-4xl font-bold text-orkut-blue mb-2"
-            >
-              Orkut 2.0
-            </motion.h1>
-            <p className="text-gray-600">Bem-vindo de volta!</p>
+        <div className="msn-char-emoji">😊</div>
+        <span className="msn-status-online" />
+      </motion.div>
+
+      <motion.div
+        initial={{ x: 100, y: -50 }}
+        animate={{ x: -20, y: 20 }}
+        transition={{ duration: 2.5 }}
+        className="msn-character msn-char-right"
+      >
+        <div className="msn-char-emoji">🤖</div>
+        <span className="msn-status-away" />
+      </motion.div>
+
+      <motion.div
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 3 }}
+        className="msn-character msn-char-top"
+      >
+        <div className="msn-char-emoji">😎</div>
+      </motion.div>
+
+      {/* ============================================================
+          MAIN LOGIN CARD (Glassmorphism + Orkut colors)
+          ============================================================ */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="login-card glassmorphic"
+      >
+        {/* HEADER com Logo Orkut */}
+        <motion.div
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="login-header"
+        >
+          <div className="orkut-logo-main">
+            <span className="orkut-o">O</span>
+            <span className="orkut-rkut">rkut</span>
           </div>
+          <p className="login-tagline">Comunidades + Chat + Nostalgia 💜</p>
+        </motion.div>
 
-          {/* Error Message */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2 text-red-700 text-sm"
-            >
-              <AlertCircle className="w-5 h-5" />
-              <span>{error}</span>
-            </motion.div>
-          )}
+        {/* ERROR MESSAGE */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="error-message"
+          >
+            <AlertCircle className="error-icon" />
+            <span>{error}</span>
+          </motion.div>
+        )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu@email.com"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue"
-                  required
-                />
-              </div>
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="login-form">
+          {/* Email Input */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="form-group"
+          >
+            <label className="form-label">Email</label>
+            <div className="input-wrapper orkut-input">
+              <Mail className="input-icon" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+                className="form-input"
+                required
+              />
             </div>
+            <p className="form-hint">💡 Demo: demo@orkut.com</p>
+          </motion.div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Senha
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue"
-                  required
-                />
-              </div>
+          {/* Password Input */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="form-group"
+          >
+            <label className="form-label">Senha</label>
+            <div className="input-wrapper orkut-input">
+              <Lock className="input-icon" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="form-input"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="toggle-password"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
             </div>
+            <p className="form-hint">🔐 Demo: demo123</p>
+          </motion.div>
 
-            {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isLoading}
-              className="w-full orkut-gradient text-white font-semibold py-2 rounded-lg hover:shadow-lg transition disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center space-x-2">
-                  <Loader className="w-5 h-5 animate-spin" />
-                  <span>Entrando...</span>
-                </span>
-              ) : (
-                'Entrar'
-              )}
-            </motion.button>
-          </form>
+          {/* Submit Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
+            className="submit-button orkut-gradient"
+          >
+            {isLoading ? (
+              <>
+                <Loader className="animate-spin" />
+                <span>Entrando...</span>
+              </>
+            ) : (
+              <>
+                <span>Entrar</span>
+                <span className="button-arrow">→</span>
+              </>
+            )}
+          </motion.button>
+        </form>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-1 h-px bg-gray-300" />
-            <span className="px-3 text-gray-500 text-sm">ou</span>
-            <div className="flex-1 h-px bg-gray-300" />
-          </div>
-
-          {/* Register Link */}
-          <p className="text-center text-gray-600 text-sm">
-            Não tem conta?{' '}
-            <Link
-              to="/register"
-              className="text-orkut-blue font-semibold hover:text-orkut-blue-dark transition"
-            >
-              Crie uma agora
-            </Link>
-          </p>
+        {/* DIVIDER */}
+        <div className="login-divider">
+          <span>ou</span>
         </div>
 
-        {/* Demo Credentials */}
-        <motion.div
+        {/* REGISTER LINK */}
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-4 p-4 bg-white bg-opacity-20 rounded-lg text-white text-xs backdrop-blur"
+          transition={{ delay: 0.7 }}
+          className="register-text"
         >
-          <p className="font-semibold mb-2">📝 Demo Credentials:</p>
-          <p>Email: demo@orkut.com</p>
-          <p>Password: demo123</p>
+          Não tem conta?{' '}
+          <Link to="/register" className="register-link">
+            Crie uma agora
+          </Link>
+        </motion.p>
+
+        {/* FORGOTTEN PASSWORD */}
+        <motion.a
+          href="#"
+          className="forgot-password"
+          whileHover={{ scale: 1.05 }}
+        >
+          Esqueceu a senha?
+        </motion.a>
+      </motion.div>
+
+      {/* ============================================================
+          FLOATING NOSTALGIA ITEMS
+          ============================================================ */}
+      <motion.div className="nostalgia-items">
+        {/* Orkut Comunidades */}
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 10, -10, 0]
+          }}
+          transition={{ duration: 4, repeat: Infinity }}
+          className="nostalgia-item community-bubble"
+        >
+          <span className="bubble-icon">🎮</span>
+          <span className="bubble-label">Gamers</span>
         </motion.div>
+
+        {/* MSN Status */}
+        <motion.div
+          animate={{
+            y: [0, 20, 0]
+          }}
+          transition={{ duration: 3.5, repeat: Infinity }}
+          className="nostalgia-item msn-bubble"
+        >
+          <span className="status-dot online" />
+          <span className="bubble-label">Online</span>
+        </motion.div>
+
+        {/* RSS Feed */}
+        <motion.div
+          animate={{
+            y: [0, -15, 0]
+          }}
+          transition={{ duration: 3.8, repeat: Infinity }}
+          className="nostalgia-item feed-bubble"
+        >
+          <span className="bubble-icon">📰</span>
+          <span className="bubble-label">Feed</span>
+        </motion.div>
+
+        {/* Audio Rooms */}
+        <motion.div
+          animate={{
+            y: [0, 15, 0]
+          }}
+          transition={{ duration: 4.2, repeat: Infinity }}
+          className="nostalgia-item audio-bubble"
+        >
+          <span className="bubble-icon">🎤</span>
+          <span className="bubble-label">Audio</span>
+        </motion.div>
+      </motion.div>
+
+      {/* ============================================================
+          BOTTOM BRANDING
+          ============================================================ */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+        className="login-footer"
+      >
+        <p>🌟 Orkut 2.0: Orkut + MSN + RSS + Clubhouse + Napster</p>
+        <p className="footer-small">A rede social que você sempre quis</p>
       </motion.div>
     </div>
   );
