@@ -60,14 +60,21 @@ async def health():
     }
 
 # Import routes
-from app.routes import auth, communities, messages, feeds
-from app.api import agents
+try:
+    from app.routes import auth, communities, messages, feeds
+    app.include_router(auth.router, prefix="/api", tags=["auth"])
+    app.include_router(communities.router, prefix="/api", tags=["communities"])
+    app.include_router(messages.router, prefix="/api", tags=["messages"])
+    app.include_router(feeds.router, prefix="/api", tags=["feeds"])
+except ImportError as e:
+    logger.warning(f"Could not import routes: {e}")
 
-app.include_router(auth.router, prefix="/api", tags=["auth"])
-app.include_router(communities.router, prefix="/api", tags=["communities"])
-app.include_router(messages.router, prefix="/api", tags=["messages"])
-app.include_router(feeds.router, prefix="/api", tags=["feeds"])
-app.include_router(agents.router, prefix="/api", tags=["agents"])
+# Try to import agents (optional)
+try:
+    from app.api import agents
+    app.include_router(agents.router, prefix="/api", tags=["agents"])
+except ImportError as e:
+    logger.warning(f"Could not import agents: {e}")
 
 if __name__ == "__main__":
     import uvicorn
