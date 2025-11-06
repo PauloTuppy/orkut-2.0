@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-100 font-sans;
+  }
+}
+
+@layer components {
+  .orkut-gradient {
+    @apply bg-gradient-to-r from-orkut-blue to-orkut-blue-light;
+  }
+  
+  .msn-gradient {
+    @apply bg-gradient-to-r from-msn-green to-green-600;
+  }
+}

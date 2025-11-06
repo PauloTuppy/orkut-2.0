@@ -12,6 +12,9 @@ RUN npm ci
 # Copy application
 COPY . .
 
+# Fix permissions for node_modules binaries
+RUN chmod -R +x node_modules/.bin
+
 # Build for production
 RUN npm run build
 
