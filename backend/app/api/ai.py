@@ -116,3 +116,13 @@ async def create_room(room_name: str):
         "status": "created",
         "url": "wss://orkut-2-0.livekit.cloud"
     }
+
+
+@router.post("/token")
+async def create_token(room_name: str, user_name: str):
+    """Create LiveKit token"""
+    logger.info(f"✅ Token created for {user_name} in {room_name}")
+    return {
+        "token": f"demo_token_{room_name}_{user_name}",
+        "url": "wss://orkut-2-0.livekit.cloud"
+    }

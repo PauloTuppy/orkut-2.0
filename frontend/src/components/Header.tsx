@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, ChevronDown, Home, Users, MessageCircle, Radio, LogOut } from 'lucide-react';
+import { Search, Bell, ChevronDown, Home, Users, MessageCircle, Radio, LogOut, Brain, Mic, Video } from 'lucide-react';
 
 export function Header() {
   const location = useLocation();
@@ -36,6 +36,15 @@ export function Header() {
                 <span>Início</span>
               </Link>
               <Link 
+                to="/profile" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/profile') ? 'text-orkut-pink' : ''
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                <span>Perfil</span>
+              </Link>
+              <Link 
                 to="/communities" 
                 className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
                   isActive('/communities') ? 'text-orkut-pink' : ''
@@ -52,6 +61,15 @@ export function Header() {
               >
                 <MessageCircle className="w-5 h-5" />
                 <span>Chat</span>
+              </Link>
+              <Link 
+                to="/chat-msn" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/chat-msn') ? 'text-orkut-pink' : ''
+                }`}
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>MSN</span>
               </Link>
               <Link 
                 to="/feed" 
@@ -80,6 +98,39 @@ export function Header() {
                 <Users className="w-5 h-5" />
                 <span>P2P</span>
               </Link>
+              
+              {/* AI Features Dropdown */}
+              <div className="relative group">
+                <button className="flex items-center space-x-2 hover:text-orkut-pink transition">
+                  <Brain className="w-5 h-5" />
+                  <span>AI</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <Link 
+                    to="/gist-memory" 
+                    className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    <Brain className="w-4 h-4" />
+                    <span>Gist Memory</span>
+                  </Link>
+                  <Link 
+                    to="/voice-chat" 
+                    className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-100"
+                  >
+                    <Mic className="w-4 h-4" />
+                    <span>Voice Chat</span>
+                  </Link>
+                  <Link 
+                    to="/livekit-rooms" 
+                    className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-100 rounded-b-lg"
+                  >
+                    <Video className="w-4 h-4" />
+                    <span>LiveKit Rooms</span>
+                  </Link>
+                </div>
+              </div>
             </nav>
           </div>
 

@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
-import { OrkutProfile } from './components/OrkutProfile';
+import { OrkutProfile as OrkutProfileComponent } from './components/OrkutProfile';
 import { MSNChatWindow } from './components/MSNChatWindow';
 import { MessageCircle } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Communities from './pages/Communities';
 import Chat from './pages/Chat';
+import ChatMSN from './pages/ChatMSN';
+import OrkutProfile from './pages/OrkutProfile';
 import Feed from './pages/Feed';
 import AudioRooms from './pages/AudioRooms';
 import P2PShare from './pages/P2PShare';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import GistMemory from './components/GistMemory';
+import VoiceChat from './components/VoiceChat';
+import LiveKitRooms from './components/LiveKitRooms';
 
 // Protected Route Component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -50,7 +55,7 @@ function MainLayout() {
         <div className="grid grid-cols-12 gap-6">
           {/* Left Sidebar - Profile */}
           <div className="col-span-12 lg:col-span-3">
-            <OrkutProfile user={mockUser} />
+            <OrkutProfileComponent user={mockUser} />
             
             {/* Friends Online */}
             <div className="mt-6 bg-white rounded-lg shadow-lg p-4">
@@ -78,9 +83,14 @@ function MainLayout() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/communities" element={<Communities />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/chat-msn" element={<ChatMSN />} />
+              <Route path="/profile" element={<OrkutProfile />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/audio" element={<AudioRooms />} />
               <Route path="/p2p" element={<P2PShare />} />
+              <Route path="/gist-memory" element={<GistMemory />} />
+              <Route path="/voice-chat" element={<VoiceChat />} />
+              <Route path="/livekit-rooms" element={<LiveKitRooms />} />
             </Routes>
           </div>
         </div>

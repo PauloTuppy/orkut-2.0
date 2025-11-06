@@ -1,0 +1,142 @@
+/* src/components/WindowFrame.css */
+
+.window-frame {
+  position: fixed;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #dfdfdf #808080 #808080 #dfdfdf;
+  box-shadow: 
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #404040,
+    2px 2px 8px rgba(0, 0, 0, 0.3);
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.window-titlebar {
+  background: linear-gradient(to right, #000080, #1084d7);
+  color: white;
+  padding: 2px 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+  height: 20px;
+  min-height: 20px;
+}
+
+.titlebar-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+  font-size: 11px;
+  overflow: hidden;
+}
+
+.window-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.window-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titlebar-buttons {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.window-button {
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  border: 1px solid;
+  border-color: #dfdfdf #404040 #404040 #dfdfdf;
+  background: #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  color: black;
+}
+
+.window-button:active {
+  border-color: #404040 #dfdfdf #dfdfdf #404040;
+  padding-top: 1px;
+  padding-left: 1px;
+}
+
+.window-button.close:hover {
+  background: #ff0000;
+  color: white;
+}
+
+.window-button.minimize:hover,
+.window-button.maximize:hover {
+  background: #dfdfdf;
+}
+
+.window-content {
+  flex: 1;
+  overflow: auto;
+  background: #c0c0c0;
+  padding: 2px;
+  min-height: 0;
+}
+
+.window-frame.minimized {
+  height: auto !important;
+}
+
+.window-frame.minimized .window-content {
+  display: none;
+}
+
+.window-frame.maximized {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Scrollbars estilo Windows 95 */
+.window-content::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+.window-content::-webkit-scrollbar-track {
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #dfdfdf #404040 #404040 #dfdfdf;
+}
+
+.window-content::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #dfdfdf #404040 #404040 #dfdfdf;
+}
+
+.window-content::-webkit-scrollbar-thumb:hover {
+  background: #dfdfdf;
+}
+
+.window-content::-webkit-scrollbar-corner {
+  background: #c0c0c0;
+}
