@@ -87,6 +87,9 @@ docker compose exec backend alembic upgrade head
 - [Quickstart](./QUICKSTART.md) - Get started in 5 minutes
 - [Deploy Guide](./DEPLOY.md) - Complete deployment guide
 - [Voice Agent Setup](./VOICE-AGENT-SETUP.md) - LiveKit voice agents guide
+- [Security Guide](./SECURITY.md) - Security documentation
+- [Security Checklist](./SECURITY-CHECKLIST.md) - Pre-deployment checklist
+- [Security Best Practices](./docs/SECURITY-BEST-PRACTICES.md) - Developer guide
 - [API Docs](http://localhost:8000/docs) - Interactive documentation
 - [Voice Agent Docs](./orkut-voice-agent/README.md) - Voice agent documentation
 
@@ -227,13 +230,28 @@ orkut-2.0/
 
 ## 🔐 Security
 
-- ✅ JWT authentication
-- ✅ Password hashing (bcrypt)
-- ✅ CORS configured
-- ✅ SQL injection protection (SQLAlchemy)
-- ✅ XSS protection
-- ✅ Rate limiting (TODO)
+- ✅ JWT authentication with expiration
+- ✅ Password hashing (Bcrypt, 12 rounds)
+- ✅ CORS whitelist (no wildcard)
+- ✅ SQL injection protection (parameterized queries)
+- ✅ XSS protection (HTML sanitization)
+- ✅ Rate limiting (60 req/min, 5 login attempts/5min)
+- ✅ Input validation (Zod + Pydantic)
+- ✅ Secure error handling
+- ✅ API keys protected (backend proxy only)
 - ✅ HTTPS in production
+- ✅ Security audit scripts
+
+**Run security audit:**
+```bash
+# Linux/macOS
+./scripts/security-audit.sh
+
+# Windows
+.\scripts\security-audit.ps1
+```
+
+See [SECURITY.md](./SECURITY.md) for complete security documentation.
 
 ## 📈 Performance
 
