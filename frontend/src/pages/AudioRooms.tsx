@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mic, MicOff, PhoneOff, Hand, Plus, Search, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import VoiceAgent from '../components/VoiceAgent';
 
 interface AudioRoom {
   id: string;
@@ -58,6 +59,7 @@ export default function AudioRooms() {
   const [activeRoom, setActiveRoom] = useState<AudioRoom | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [hasRaisedHand, setHasRaisedHand] = useState(false);
+  const [activeAgent, setActiveAgent] = useState<'sales' | 'technical' | 'pricing' | null>(null);
 
   return (
     <div>
@@ -77,6 +79,48 @@ export default function AudioRooms() {
                 <Plus className="w-5 h-5" />
                 <span>Criar Sala</span>
               </button>
+            </div>
+
+            {/* Voice AI Agents Section */}
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 mb-6 text-white">
+              <h2 className="text-2xl font-bold mb-2">🤖 Voice AI Agents</h2>
+              <p className="mb-4 opacity-90">
+                Talk to our AI agents powered by Cerebras + Cartesia + LiveKit
+              </p>
+
+              {activeAgent ? (
+                <VoiceAgent 
+                  agentType={activeAgent} 
+                  onClose={() => setActiveAgent(null)}
+                />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button
+                    onClick={() => setActiveAgent('sales')}
+                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition text-left"
+                  >
+                    <div className="text-3xl mb-2">🎤</div>
+                    <h3 className="font-bold mb-1">Sales Agent</h3>
+                    <p className="text-sm opacity-90">Learn about features & pricing</p>
+                  </button>
+                  <button
+                    onClick={() => setActiveAgent('technical')}
+                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition text-left"
+                  >
+                    <div className="text-3xl mb-2">🔧</div>
+                    <h3 className="font-bold mb-1">Technical Support</h3>
+                    <p className="text-sm opacity-90">Get help with technical questions</p>
+                  </button>
+                  <button
+                    onClick={() => setActiveAgent('pricing')}
+                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition text-left"
+                  >
+                    <div className="text-3xl mb-2">💰</div>
+                    <h3 className="font-bold mb-1">Pricing Specialist</h3>
+                    <p className="text-sm opacity-90">Find the best plan for you</p>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Search */}

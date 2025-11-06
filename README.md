@@ -6,9 +6,13 @@ Modern social network inspired by classic Orkut, built with cutting-edge technol
 
 - 🔐 Secure JWT authentication
 - 👥 Friends and communities system
-- 💬 Real-time chat (WebSockets)
+- 💬 Real-time chat (WebSockets + MSN Messenger style)
 - 📝 Posts and testimonials
-- 🤖 Integrated AI (Gemini API)
+- 🤖 Integrated AI (Gemini API + Cerebras LLM)
+- 🎤 Voice AI Agents (LiveKit + Cartesia)
+- 📰 RSS Feed Reader with Gist Memory
+- 🎙️ Audio Rooms (Clubhouse style)
+- 📁 P2P File Sharing (Napster style)
 - ⚡ Smart caching with KeyDB
 - 🗄️ SmartSQL for optimized queries
 - 📊 Monitoring and logging
@@ -22,13 +26,22 @@ Modern social network inspired by classic Orkut, built with cutting-edge technol
 - **SQLAlchemy** - Python ORM
 - **Alembic** - Database migrations
 - **Gemini API** - Google AI
+- **LiveKit** - Real-time voice/video platform
 
 ### Frontend
 - **React 18** - UI library
 - **TypeScript** - Type safety
 - **Vite** - Build tool
+- **TailwindCSS** - Utility-first CSS
+- **Framer Motion** - Animations
 - **Zustand** - State management
 - **Socket.io** - Real-time communication
+- **LiveKit React** - Voice agent integration
+
+### AI/ML
+- **Cerebras** - Ultra-fast LLM inference (LLaMA 3.3 70B)
+- **Cartesia** - Speech-to-text and text-to-speech
+- **Gemini** - Document analysis and Gist Memory
 
 ### DevOps
 - **Docker** - Containerization
@@ -73,7 +86,9 @@ docker compose exec backend alembic upgrade head
 
 - [Quickstart](./QUICKSTART.md) - Get started in 5 minutes
 - [Deploy Guide](./DEPLOY.md) - Complete deployment guide
+- [Voice Agent Setup](./VOICE-AGENT-SETUP.md) - LiveKit voice agents guide
 - [API Docs](http://localhost:8000/docs) - Interactive documentation
+- [Voice Agent Docs](./orkut-voice-agent/README.md) - Voice agent documentation
 
 ## 🧪 Testing
 

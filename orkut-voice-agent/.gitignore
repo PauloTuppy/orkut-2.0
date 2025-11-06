@@ -1,0 +1,23 @@
+# Environment
+.env
+venv/
+env/
+*.pyc
+__pycache__/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# LiveKit
+livekit.toml

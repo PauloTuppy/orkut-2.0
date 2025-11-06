@@ -1,0 +1,28 @@
+[project]
+# Your project subdomain (change to your actual project)
+subdomain = "orkut-2-0-xxxxx"
+
+[agent]
+# Agent ID (generated during `lk agent create`)
+id = "orkut-voice-agent"
+
+# Name
+name = "Orkut 2.0 Voice Agent"
+
+# Docker image
+docker_image = "orkut-voice-agent:latest"
+
+# API endpoints
+api_key = "devkey"
+api_secret = "secret"
+
+# Auto-scaling
+min_replicas = 1
+max_replicas = 10
+target_cpu_percent = 70
+
+# Environment variables (in production, use secrets manager)
+[agent.env]
+ENVIRONMENT = "production"
+LOG_LEVEL = "INFO"
+DEBUG = "false"

@@ -42,11 +42,13 @@ async def health():
 
 # Import routes
 from app.routes import auth, communities, messages, feeds
+from app.api import agents
 
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(communities.router, prefix="/api", tags=["communities"])
 app.include_router(messages.router, prefix="/api", tags=["messages"])
 app.include_router(feeds.router, prefix="/api", tags=["feeds"])
+app.include_router(agents.router, prefix="/api", tags=["agents"])
 
 if __name__ == "__main__":
     import uvicorn
