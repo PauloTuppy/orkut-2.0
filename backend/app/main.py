@@ -2,7 +2,9 @@ from fastapi import FastAPI, WebSocketException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.cache import cache
+from app.middleware.rate_limit import RateLimitMiddleware, LoginRateLimitMiddleware
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,14 +24,31 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS
+# ============================================================
+# CORS (Seguro - Whitelist explícita)
+# ============================================================
+allowed_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://localhost:5173"
+).split(",")
+
+# Remove espaços
+allowed_origins = [origin.strip() for origin in allowed_origins]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=allowed_origins,  # ✅ Whitelist explícita
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # ✅ Métodos específicos
+    allow_headers=["Content-Type", "Authorization"],  # ✅ Headers específicos
+    max_age=3600  # Cache preflight por 1 hora
 )
+
+# ============================================================
+# Rate Limiting
+# ============================================================
+app.add_middleware(RateLimitMiddleware, requests_per_minute=60)
+app.add_middleware(LoginRateLimitMiddleware, max_attempts=5)
 
 @app.get("/health")
 async def health():

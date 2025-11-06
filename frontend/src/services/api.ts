@@ -1,19 +1,28 @@
 import axios from 'axios';
 
+// ============================================================
+// SEGURO: API client sem keys expostas
+// Todas as keys ficam no backend!
+// ============================================================
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 30000, // 30 seconds
 });
 
-// Interceptor para adicionar token
+// ============================================================
+// Request Interceptor: Adiciona JWT token (não API keys!)
+// ============================================================
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
+      // ✅ Apenas JWT token, nunca API keys
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -21,14 +30,30 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor para erros
+// ============================================================
+// Response Interceptor: Trata erros de forma segura
+// ============================================================
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // 401: Token expirado ou inválido
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
-      window.location.href = '/login';
+      // Redirecionar sem expor motivo real
+      window.location.href = '/login?session_expired=true';
     }
+
+    // 429: Rate limit
+    if (error.response?.status === 429) {
+      console.warn('Rate limit exceeded');
+    }
+
+    // 500+: Erro de servidor (log seguro, sem dados sensíveis)
+    if (error.response?.status >= 500) {
+      console.error('Server error:', error.response?.status);
+      // TODO: Enviar para monitoring (ex: Sentry)
+    }
+
     return Promise.reject(error);
   }
 );
