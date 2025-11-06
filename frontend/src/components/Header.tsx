@@ -1,10 +1,16 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Bell, ChevronDown, Home, Users, MessageCircle, Radio } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search, Bell, ChevronDown, Home, Users, MessageCircle, Radio, LogOut } from 'lucide-react';
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const isActive = (path: string) => location.pathname === path;
+  
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    navigate('/login');
+  };
   
   return (
     <header className="orkut-gradient text-white shadow-lg">
@@ -78,6 +84,16 @@ export function Header() {
               </div>
               <span className="hidden md:block">Paulo Tuppy</span>
               <ChevronDown className="w-4 h-4" />
+            </button>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-2 hover:bg-white/20 rounded-lg px-3 py-2 transition"
+              title="Sair"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="hidden md:block">Sair</span>
             </button>
           </div>
         </div>
