@@ -25,23 +25,27 @@ app = FastAPI(
 )
 
 # ============================================================
-# CORS (Seguro - Whitelist explícita)
+# CORS (Configuração Completa - ANTES das rotas!)
 # ============================================================
-allowed_origins = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:3000,http://localhost:5173"
-).split(",")
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://192.168.3.13:3000",  # IP local da rede
+    "http://192.168.3.13:5173",
+]
 
-# Remove espaços
-allowed_origins = [origin.strip() for origin in allowed_origins]
+logger.info(f"✅ CORS Origins: {ALLOWED_ORIGINS}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,  # ✅ Whitelist explícita
+    allow_origins=ALLOWED_ORIGINS,  # ✅ Whitelist explícita com IP local
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],  # ✅ Métodos específicos
-    allow_headers=["Content-Type", "Authorization"],  # ✅ Headers específicos
-    max_age=3600  # Cache preflight por 1 hora
+    allow_methods=["*"],  # ✅ Todos os métodos (GET, POST, PUT, DELETE, OPTIONS)
+    allow_headers=["*"],  # ✅ Todos os headers
+    max_age=600,  # Cache preflight por 10 minutos
+    expose_headers=["*"]
 )
 
 # ============================================================
@@ -57,6 +61,24 @@ async def health():
         "version": "0.1.0",
         "cache": "keydb" if cache.enabled else "disabled",
         "database": "postgresql"
+    }
+
+@app.get("/test-cors")
+async def test_cors():
+    """Test CORS configuration"""
+    logger.info("📍 CORS test called")
+    return {
+        "status": "CORS OK ✅",
+        "message": "CORS is working correctly",
+        "allowed_origins": ALLOWED_ORIGINS
+    }
+
+@app.options("/{full_path:path}")
+async def preflight(full_path: str):
+    """Handle OPTIONS (preflight) requests"""
+    logger.debug(f"📍 OPTIONS preflight for: {full_path}")
+    return {
+        "message": "OK"
     }
 
 # Import routes
