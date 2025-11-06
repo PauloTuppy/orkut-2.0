@@ -44,18 +44,42 @@ export function Header() {
                 <Users className="w-5 h-5" />
                 <span>Comunidades</span>
               </Link>
-              <a href="#" className="flex items-center space-x-2 hover:text-orkut-pink transition">
-                <Users className="w-5 h-5" />
-                <span>Amigos</span>
-              </a>
-              <a href="#" className="flex items-center space-x-2 hover:text-orkut-pink transition">
+              <Link 
+                to="/chat" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/chat') ? 'text-orkut-pink' : ''
+                }`}
+              >
                 <MessageCircle className="w-5 h-5" />
-                <span>Mensagens</span>
-              </a>
-              <a href="#" className="flex items-center space-x-2 hover:text-orkut-pink transition">
+                <span>Chat</span>
+              </Link>
+              <Link 
+                to="/feed" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/feed') ? 'text-orkut-pink' : ''
+                }`}
+              >
                 <Radio className="w-5 h-5" />
-                <span>Salas de Áudio</span>
-              </a>
+                <span>Feed</span>
+              </Link>
+              <Link 
+                to="/audio" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/audio') ? 'text-orkut-pink' : ''
+                }`}
+              >
+                <Radio className="w-5 h-5" />
+                <span>Áudio</span>
+              </Link>
+              <Link 
+                to="/p2p" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/p2p') ? 'text-orkut-pink' : ''
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                <span>P2P</span>
+              </Link>
             </nav>
           </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { OrkutProfile } from './components/OrkutProfile';
@@ -6,6 +6,10 @@ import { MSNChatWindow } from './components/MSNChatWindow';
 import { MessageCircle } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Communities from './pages/Communities';
+import Chat from './pages/Chat';
+import Feed from './pages/Feed';
+import AudioRooms from './pages/AudioRooms';
+import P2PShare from './pages/P2PShare';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -73,6 +77,10 @@ function MainLayout() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/communities" element={<Communities />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/feed" element={<Feed />} />
+              <Route path="/audio" element={<AudioRooms />} />
+              <Route path="/p2p" element={<P2PShare />} />
             </Routes>
           </div>
         </div>
