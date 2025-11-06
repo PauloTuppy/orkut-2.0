@@ -1,24 +1,43 @@
+import { Link, useLocation } from 'react-router-dom';
 import { Search, Bell, ChevronDown, Home, Users, MessageCircle, Radio } from 'lucide-react';
 
 export function Header() {
+  const location = useLocation();
+  
+  const isActive = (path: string) => location.pathname === path;
+  
   return (
     <header className="orkut-gradient text-white shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <h1 className="text-2xl font-bold">Orkut 2.0</h1>
+            <Link to="/">
+              <h1 className="text-2xl font-bold cursor-pointer hover:text-orkut-pink transition">
+                Orkut 2.0
+              </h1>
+            </Link>
             
             {/* Navigation */}
             <nav className="hidden md:flex space-x-6">
-              <a href="#" className="flex items-center space-x-2 hover:text-orkut-pink transition">
+              <Link 
+                to="/" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/') ? 'text-orkut-pink' : ''
+                }`}
+              >
                 <Home className="w-5 h-5" />
                 <span>Início</span>
-              </a>
-              <a href="#" className="flex items-center space-x-2 hover:text-orkut-pink transition">
+              </Link>
+              <Link 
+                to="/communities" 
+                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
+                  isActive('/communities') ? 'text-orkut-pink' : ''
+                }`}
+              >
                 <Users className="w-5 h-5" />
                 <span>Comunidades</span>
-              </a>
+              </Link>
               <a href="#" className="flex items-center space-x-2 hover:text-orkut-pink transition">
                 <Users className="w-5 h-5" />
                 <span>Amigos</span>
