@@ -105,6 +105,9 @@ export const VoiceAgent: React.FC<VoiceAgentProps> = ({
 
 const VoiceAgentUI: React.FC = () => {
   const { state, audioTrack } = useVoiceAssistant();
+  
+  // Convert state to string for display
+  const stateStr = String(state || 'idle');
 
   return (
     <div className="space-y-4">
@@ -118,7 +121,7 @@ const VoiceAgentUI: React.FC = () => {
             state === 'speaking' ? 'bg-blue-400 animate-pulse' :
             'bg-gray-400'
           }`} />
-          <span className="font-medium capitalize">{state}</span>
+          <span className="font-medium capitalize">{stateStr}</span>
         </div>
 
         {audioTrack && (
@@ -133,10 +136,10 @@ const VoiceAgentUI: React.FC = () => {
         )}
 
         <div className="text-center text-sm mt-4 opacity-90">
-          {state === 'listening' && '🎤 Listening...'}
-          {state === 'thinking' && '🤔 Processing...'}
-          {state === 'speaking' && '🗣️ Speaking...'}
-          {!state || state === 'idle' ? '💬 Start speaking to interact' : null}
+          {state === 'listening' ? '🎤 Listening...' :
+           state === 'thinking' ? '🤔 Processing...' :
+           state === 'speaking' ? '🗣️ Speaking...' :
+           '💬 Start speaking to interact'}
         </div>
       </div>
 
