@@ -102,7 +102,7 @@ export default function AudioRooms() {
           >
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold text-gray-900">
-                🎙️ Salas de Áudio
+                🎙️ Audio Rooms
               </h1>
               <button 
                 onClick={() => setShowCreateModal(true)}
@@ -115,9 +115,9 @@ export default function AudioRooms() {
 
             {/* Voice AI Agents Section */}
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 mb-6 text-white">
-              <h2 className="text-2xl font-bold mb-2">🤖 Agentes de IA por Voz</h2>
+              <h2 className="text-2xl font-bold mb-2">🤖 Voice AI Agents</h2>
               <p className="mb-4 opacity-90">
-                Converse com nossos agentes de IA powered by Cerebras + Cartesia + LiveKit
+                Talk to our AI agents powered by Cerebras + Cartesia + LiveKit
               </p>
 
               {activeAgent ? (
@@ -132,24 +132,24 @@ export default function AudioRooms() {
                     className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition text-left"
                   >
                     <div className="text-3xl mb-2">🎤</div>
-                    <h3 className="font-bold mb-1">Agente de Vendas</h3>
-                    <p className="text-sm opacity-90">Conheça recursos e preços</p>
+                    <h3 className="font-bold mb-1">Sales Agent</h3>
+                    <p className="text-sm opacity-90">Learn about features & pricing</p>
                   </button>
                   <button
                     onClick={() => setActiveAgent('technical')}
                     className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition text-left"
                   >
                     <div className="text-3xl mb-2">🔧</div>
-                    <h3 className="font-bold mb-1">Suporte Técnico</h3>
-                    <p className="text-sm opacity-90">Obtenha ajuda com questões técnicas</p>
+                    <h3 className="font-bold mb-1">Technical Support</h3>
+                    <p className="text-sm opacity-90">Get help with technical questions</p>
                   </button>
                   <button
                     onClick={() => setActiveAgent('pricing')}
                     className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg p-4 transition text-left"
                   >
                     <div className="text-3xl mb-2">💰</div>
-                    <h3 className="font-bold mb-1">Especialista em Preços</h3>
-                    <p className="text-sm opacity-90">Encontre o melhor plano para você</p>
+                    <h3 className="font-bold mb-1">Pricing Specialist</h3>
+                    <p className="text-sm opacity-90">Find the best plan for you</p>
                   </button>
                 </div>
               )}
@@ -311,7 +311,7 @@ export default function AudioRooms() {
               <button
                 onClick={() => setShowAudioUploader(true)}
                 className="px-6 py-3 rounded-lg font-semibold transition bg-purple-600 text-white hover:bg-purple-700"
-                title="Gerenciar Áudios"
+                title="Manage Audio"
               >
                 <Upload className="w-5 h-5 inline mr-2" />
                 Áudios

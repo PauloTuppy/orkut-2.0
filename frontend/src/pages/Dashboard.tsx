@@ -183,9 +183,9 @@ export default function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="orkut-gradient rounded-lg shadow-lg p-6 mb-6 text-white"
       >
-        <h1 className="text-3xl font-bold mb-2">Bem-vindo ao Orkut 2.0! 🎉</h1>
+        <h1 className="text-3xl font-bold mb-2">Welcome to Orkut 2.0! 🎉</h1>
         <p className="opacity-90">
-          Conecte com amigos, explore comunidades e descubra conteúdo incrível
+          Connect with friends, explore communities and discover amazing content
         </p>
       </motion.div>
 

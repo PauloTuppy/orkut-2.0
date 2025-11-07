@@ -236,7 +236,7 @@ export default function Communities() {
         className="max-w-6xl mx-auto mb-6"
       >
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Comunidades</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Communities</h1>
           <button 
             onClick={() => setShowCreateModal(true)}
             className="bg-orkut-blue text-white px-6 py-2 rounded-lg hover:bg-orkut-blue-dark transition flex items-center space-x-2"
@@ -251,7 +251,7 @@ export default function Communities() {
           <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Buscar comunidades..."
+            placeholder="Search communities..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue"

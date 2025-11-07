@@ -258,7 +258,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-2xl font-bold">🎙️ Gerenciar Áudios</h2>
+            <h2 className="text-2xl font-bold">🎙️ Manage Audio</h2>
             <button
               onClick={onClose}
               className="text-white hover:bg-white/20 p-2 rounded-lg transition"
@@ -266,7 +266,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
               <X className="w-6 h-6" />
             </button>
           </div>
-          <p className="opacity-90">Grave ou faça upload de diálogos e podcasts</p>
+          <p className="opacity-90">Record or upload dialogues and podcasts</p>
         </div>
 
         {/* Actions */}
@@ -277,7 +277,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
               <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`} />
               <div>
                 <p className="font-semibold text-gray-900">
-                  {isRecording ? 'Gravando...' : 'Gravar Áudio'}
+                  {isRecording ? 'Recording...' : 'Record Audio'}
                 </p>
                 {isRecording && (
                   <p className="text-sm text-gray-600">
@@ -302,7 +302,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
               ) : (
                 <>
                   <Mic className="w-5 h-5" />
-                  <span>Gravar</span>
+                  <span>Record</span>
                 </>
               )}
             </button>
@@ -351,7 +351,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
         {/* Audio List */}
         <div className="flex-1 overflow-y-auto p-6">
           <h3 className="font-bold text-gray-900 mb-4">
-            📚 Biblioteca ({audioFiles.length} áudios)
+            📚 Library ({audioFiles.length} audios)
           </h3>
 
           {audioFiles.length === 0 ? (
@@ -412,7 +412,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
                       <button
                         onClick={() => deleteAudio(audio.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                        title="Deletar"
+                        title="Delete"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
