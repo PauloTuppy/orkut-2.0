@@ -312,7 +312,7 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
           <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
             <div>
               <p className="font-semibold text-gray-900">Upload de Arquivo</p>
-              <p className="text-sm text-gray-600">MP3, WAV, OGG (máx 100MB)</p>
+              <p className="text-sm text-gray-600">MP3, WAV, OGG, M4A, AAC (máx 100MB)</p>
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}

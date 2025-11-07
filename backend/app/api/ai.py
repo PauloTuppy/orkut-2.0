@@ -867,7 +867,8 @@ async def upload_file(file: UploadFile = File(...), category: str = "general", d
     try:
         # Validate file type
         allowed_types = {
-            'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg',
+            'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 
+            'audio/mp4', 'audio/m4a', 'audio/x-m4a', 'audio/aac',
             'video/mp4', 'video/avi', 'video/mkv',
             'application/pdf', 'text/plain', 'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
