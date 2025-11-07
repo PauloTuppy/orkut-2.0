@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Mic, MicOff, PhoneOff, Hand, Plus, Search, Volume2, X } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Hand, Plus, Search, Volume2, X, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import VoiceAgent from '../components/VoiceAgent';
+import AudioUploader from '../components/AudioUploader';
 
 interface AudioRoom {
   id: string;
@@ -61,6 +62,7 @@ export default function AudioRooms() {
   const [hasRaisedHand, setHasRaisedHand] = useState(false);
   const [activeAgent, setActiveAgent] = useState<'sales' | 'technical' | 'pricing' | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showAudioUploader, setShowAudioUploader] = useState(false);
   const [newRoom, setNewRoom] = useState({
     title: '',
     description: '',
@@ -307,6 +309,15 @@ export default function AudioRooms() {
               </button>
 
               <button
+                onClick={() => setShowAudioUploader(true)}
+                className="px-6 py-3 rounded-lg font-semibold transition bg-purple-600 text-white hover:bg-purple-700"
+                title="Gerenciar Áudios"
+              >
+                <Upload className="w-5 h-5 inline mr-2" />
+                Áudios
+              </button>
+
+              <button
                 onClick={() => setHasRaisedHand(!hasRaisedHand)}
                 className={`px-6 py-3 rounded-lg font-semibold transition ${
                   hasRaisedHand
@@ -328,6 +339,16 @@ export default function AudioRooms() {
           </div>
         </motion.div>
       )}
+
+      {/* Audio Uploader Modal */}
+      <AnimatePresence>
+        {showAudioUploader && activeRoom && (
+          <AudioUploader
+            roomId={activeRoom.id}
+            onClose={() => setShowAudioUploader(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Create Room Modal */}
       <AnimatePresence>
