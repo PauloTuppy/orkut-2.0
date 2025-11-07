@@ -115,17 +115,13 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
     setUploadProgress(0);
 
     try {
-      // Simular upload com progresso
       const formData = new FormData();
       formData.append('file', file);
       formData.append('category', 'audio');
       formData.append('description', `Áudio da sala ${roomId}`);
 
-      // Simular progresso
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        setUploadProgress(i);
-      }
+      // Simular progresso inicial
+      setUploadProgress(10);
 
       // Upload real para o backend
       const response = await fetch('http://localhost:8000/api/ai/p2p/upload', {
@@ -133,38 +129,66 @@ export default function AudioUploader({ roomId, onClose }: AudioUploaderProps) {
         body: formData
       });
 
+      setUploadProgress(50);
+
       if (!response.ok) {
-        throw new Error('Erro no upload');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Erro ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
+      setUploadProgress(75);
 
       // Criar objeto de áudio
       const audio = new Audio();
-      audio.src = URL.createObjectURL(file);
+      const audioUrl = URL.createObjectURL(file);
+      audio.src = audioUrl;
       
-      audio.onloadedmetadata = () => {
-        const newAudio: AudioFile = {
-          id: result.file_id || Date.now().toString(),
-          name: file.name,
-          duration: Math.floor(audio.duration),
-          size: file.size,
-          url: URL.createObjectURL(file),
-          type: 'upload',
-          createdAt: new Date()
-        };
+      await new Promise<void>((resolve, reject) => {
+        audio.onloadedmetadata = () => resolve();
+        audio.onerror = () => reject(new Error('Erro ao carregar áudio'));
+        setTimeout(() => reject(new Error('Timeout ao carregar áudio')), 5000);
+      });
 
-        setAudioFiles(prev => [newAudio, ...prev]);
+      const newAudio: AudioFile = {
+        id: result.file_id || Date.now().toString(),
+        name: file.name,
+        duration: Math.floor(audio.duration) || 0,
+        size: file.size,
+        url: audioUrl,
+        type: 'upload',
+        createdAt: new Date()
       };
 
-      alert('✅ Áudio enviado com sucesso!');
+      setAudioFiles(prev => [newAudio, ...prev]);
+      setUploadProgress(100);
 
-    } catch (error) {
+      // Feedback de sucesso
+      setTimeout(() => {
+        alert(`✅ Áudio enviado com sucesso!\n\n📄 ${file.name}\n⏱️ ${Math.floor(audio.duration)}s\n💾 ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+      }, 300);
+
+    } catch (error: any) {
       console.error('Erro no upload:', error);
-      alert('❌ Erro ao enviar áudio');
+      
+      let errorMessage = '❌ Erro ao enviar áudio\n\n';
+      
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage += '🔌 Backend não está respondendo.\n\nVerifique se o servidor está rodando:\n• Execute: .\\start-backend.ps1\n• URL: http://localhost:8000';
+      } else if (error.message.includes('413')) {
+        errorMessage += '📏 Arquivo muito grande.\n\nTamanho máximo: 100MB';
+      } else if (error.message.includes('415')) {
+        errorMessage += '🎵 Formato não suportado.\n\nUse: MP3, WAV, OGG, M4A';
+      } else if (error.message.includes('Timeout')) {
+        errorMessage += '⏱️ Tempo esgotado ao processar áudio.\n\nTente um arquivo menor.';
+      } else {
+        errorMessage += `💬 ${error.message}`;
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
+      setTimeout(() => setUploadProgress(0), 500);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
