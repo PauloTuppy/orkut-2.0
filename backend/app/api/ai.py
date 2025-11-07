@@ -461,7 +461,7 @@ import os
 
 @router.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
-    """Upload and process PDF file"""
+    """Upload and process PDF file with real text extraction"""
     try:
         # Verificar se é PDF
         if not file.content_type == "application/pdf":
@@ -480,51 +480,97 @@ async def upload_pdf(file: UploadFile = File(...)):
             temp_path = temp_file.name
         
         try:
-            # Extrair texto do PDF (simulado)
-            # Em produção, use PyPDF2, pdfplumber ou similar
-            extracted_text = f"""
+            # Tentar extrair texto real do PDF
+            extracted_text = ""
+            num_pages = 0
+            
+            try:
+                # Tentar com PyPDF2 primeiro
+                import PyPDF2
+                
+                with open(temp_path, 'rb') as pdf_file:
+                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+                    num_pages = len(pdf_reader.pages)
+                    
+                    for page_num, page in enumerate(pdf_reader.pages):
+                        try:
+                            page_text = page.extract_text()
+                            if page_text:
+                                extracted_text += f"\n\n--- Página {page_num + 1} ---\n\n{page_text}"
+                        except Exception as page_error:
+                            logger.warning(f"⚠️  Error extracting page {page_num + 1}: {page_error}")
+                            continue
+                
+                logger.info(f"✅ PDF extracted with PyPDF2: {num_pages} pages")
+                
+            except ImportError:
+                logger.warning("⚠️  PyPDF2 not installed, trying pdfplumber")
+                
+                try:
+                    # Tentar com pdfplumber
+                    import pdfplumber
+                    
+                    with pdfplumber.open(temp_path) as pdf:
+                        num_pages = len(pdf.pages)
+                        
+                        for page_num, page in enumerate(pdf.pages):
+                            try:
+                                page_text = page.extract_text()
+                                if page_text:
+                                    extracted_text += f"\n\n--- Página {page_num + 1} ---\n\n{page_text}"
+                            except Exception as page_error:
+                                logger.warning(f"⚠️  Error extracting page {page_num + 1}: {page_error}")
+                                continue
+                    
+                    logger.info(f"✅ PDF extracted with pdfplumber: {num_pages} pages")
+                    
+                except ImportError:
+                    logger.error("❌ Neither PyPDF2 nor pdfplumber is installed")
+                    raise HTTPException(
+                        status_code=500, 
+                        detail="PDF processing libraries not installed. Please install PyPDF2 or pdfplumber."
+                    )
+            
+            # Se não conseguiu extrair texto, usar simulação
+            if not extracted_text.strip():
+                logger.warning("⚠️  No text extracted, using simulation")
+                extracted_text = f"""
 Documento PDF processado: {file.filename}
 Tamanho: {len(content) / 1024 / 1024:.2f} MB
 
-TEXTO EXTRAÍDO (SIMULADO):
+⚠️ AVISO: Não foi possível extrair texto deste PDF.
+Possíveis razões:
+- PDF contém apenas imagens (necessita OCR)
+- PDF está protegido ou criptografado
+- PDF tem formato não suportado
 
-Este é um exemplo de texto extraído de um PDF.
-Em uma implementação real, você usaria bibliotecas como:
-- PyPDF2: para PDFs simples
-- pdfplumber: para PDFs com tabelas
-- pymupdf (fitz): para PDFs complexos
+CONTEÚDO SIMULADO:
 
-Conteúdo simulado do documento:
-1. Introdução e objetivos
-2. Metodologia aplicada
-3. Resultados obtidos
-4. Análise dos dados
-5. Conclusões e recomendações
+Este é um documento PDF que foi carregado com sucesso.
+Para análise completa, certifique-se de que o PDF contém texto selecionável.
 
-Para implementar extração real de PDF, instale:
-pip install PyPDF2 pdfplumber pymupdf
+Se o PDF contém apenas imagens, considere usar ferramentas de OCR como:
+- Tesseract OCR
+- Google Cloud Vision API
+- AWS Textract
 
-Exemplo de código:
-import PyPDF2
-with open(pdf_path, 'rb') as file:
-    reader = PyPDF2.PdfReader(file)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text()
-
-Total de páginas simuladas: 5
-Palavras extraídas: ~500
-            """
+Total de páginas: {num_pages if num_pages > 0 else 'desconhecido'}
+                """
+                num_pages = max(1, num_pages)
             
-            logger.info(f"✅ PDF processed: {file.filename} ({len(content)} bytes)")
+            # Limpar texto extraído
+            extracted_text = extracted_text.strip()
+            word_count = len(extracted_text.split())
+            
+            logger.info(f"✅ PDF processed: {file.filename} ({len(content)} bytes, {num_pages} pages, {word_count} words)")
             
             return {
                 "filename": file.filename,
                 "size": len(content),
                 "text": extracted_text,
-                "pages": 5,
-                "words": len(extracted_text.split()),
-                "message": "PDF processed successfully (simulated extraction)"
+                "pages": num_pages,
+                "words": word_count,
+                "message": f"PDF processed successfully ({num_pages} pages, {word_count} words extracted)"
             }
             
         finally:
@@ -532,6 +578,8 @@ Palavras extraídas: ~500
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
                 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"❌ PDF processing error: {e}")
         raise HTTPException(status_code=500, detail=f"Error processing PDF: {str(e)}")

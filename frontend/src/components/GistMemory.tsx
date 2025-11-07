@@ -243,9 +243,25 @@ const GistMemory: React.FC = () => {
         setUploadProgress(0);
       }, 500);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao processar PDF:', error);
-      alert('Erro ao processar PDF. Verifique se o arquivo não está corrompido e tente novamente.');
+      
+      // Mensagem de erro mais detalhada
+      let errorMessage = 'Erro ao processar PDF.';
+      
+      if (error.response) {
+        // Erro do servidor
+        errorMessage = `Erro do servidor: ${error.response.data?.detail || error.response.statusText}`;
+      } else if (error.request) {
+        // Erro de rede
+        errorMessage = 'Erro de conexão. Verifique se o backend está rodando em http://localhost:8000';
+      } else {
+        // Outro erro
+        errorMessage = `Erro: ${error.message}`;
+      }
+      
+      alert(`❌ ${errorMessage}\n\n💡 Dica: Certifique-se de que:\n• O backend está rodando (uvicorn app.main:app --reload)\n• O arquivo PDF não está corrompido\n• O arquivo tem menos de 50MB`);
+      
       setFileName('');
       setTitle('');
     } finally {
