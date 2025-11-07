@@ -1,4 +1,4 @@
-import { User, Star, Users, Eye } from 'lucide-react';
+import { Star, Users, Eye } from 'lucide-react';
 
 interface OrkutProfileProps {
   user: {
@@ -10,6 +10,17 @@ interface OrkutProfileProps {
     rating: number;
   };
 }
+
+// Função para formatar números grandes
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace('.0', '') + 'K';
+  }
+  return num.toString();
+};
 
 export function OrkutProfile({ user }: OrkutProfileProps) {
   return (
@@ -48,7 +59,7 @@ export function OrkutProfile({ user }: OrkutProfileProps) {
             Amigos
           </span>
           <span className="font-semibold text-orkut-blue">
-            {user.friends}
+            {formatNumber(user.friends)}
           </span>
         </div>
 

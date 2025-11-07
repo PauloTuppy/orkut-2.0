@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Mic, MicOff, PhoneOff, Hand, Plus, Search, Volume2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mic, MicOff, PhoneOff, Hand, Plus, Search, Volume2, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import VoiceAgent from '../components/VoiceAgent';
 
 interface AudioRoom {
@@ -55,11 +55,38 @@ const ROOMS: AudioRoom[] = [
 ];
 
 export default function AudioRooms() {
-  const [rooms] = useState(ROOMS);
+  const [rooms, setRooms] = useState(ROOMS);
   const [activeRoom, setActiveRoom] = useState<AudioRoom | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [hasRaisedHand, setHasRaisedHand] = useState(false);
   const [activeAgent, setActiveAgent] = useState<'sales' | 'technical' | 'pricing' | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newRoom, setNewRoom] = useState({
+    title: '',
+    description: '',
+    category: 'Tech'
+  });
+
+  const handleCreateRoom = () => {
+    if (!newRoom.title.trim() || !newRoom.description.trim()) return;
+
+    const createdRoom: AudioRoom = {
+      id: Date.now().toString(),
+      title: newRoom.title,
+      description: newRoom.description,
+      category: newRoom.category,
+      speakers: [
+        { id: 'user', name: 'Você', avatar: '👤', isSpeaking: false }
+      ],
+      listeners: 1,
+      joined: true
+    };
+
+    setRooms([createdRoom, ...rooms]);
+    setActiveRoom(createdRoom);
+    setShowCreateModal(false);
+    setNewRoom({ title: '', description: '', category: 'Tech' });
+  };
 
   return (
     <div>
@@ -75,7 +102,10 @@ export default function AudioRooms() {
               <h1 className="text-3xl font-bold text-gray-900">
                 🎙️ Salas de Áudio
               </h1>
-              <button className="bg-orkut-blue text-white px-6 py-2 rounded-lg hover:bg-orkut-blue-dark transition flex items-center space-x-2">
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                className="bg-orkut-blue text-white px-6 py-2 rounded-lg hover:bg-orkut-blue-dark transition flex items-center space-x-2"
+              >
                 <Plus className="w-5 h-5" />
                 <span>Criar Sala</span>
               </button>
@@ -298,6 +328,104 @@ export default function AudioRooms() {
           </div>
         </motion.div>
       )}
+
+      {/* Create Room Modal */}
+      <AnimatePresence>
+        {showCreateModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowCreateModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  🎙️ Criar Nova Sala
+                </h2>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Título da Sala
+                  </label>
+                  <input
+                    type="text"
+                    value={newRoom.title}
+                    onChange={(e) => setNewRoom({ ...newRoom, title: e.target.value })}
+                    placeholder="Ex: Discussão sobre IA"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descrição
+                  </label>
+                  <textarea
+                    value={newRoom.description}
+                    onChange={(e) => setNewRoom({ ...newRoom, description: e.target.value })}
+                    placeholder="Descreva sobre o que será a conversa..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Categoria
+                  </label>
+                  <select
+                    value={newRoom.category}
+                    onChange={(e) => setNewRoom({ ...newRoom, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue"
+                  >
+                    <option value="Tech">Tecnologia</option>
+                    <option value="Música">Música</option>
+                    <option value="Esportes">Esportes</option>
+                    <option value="Educação">Educação</option>
+                    <option value="Entretenimento">Entretenimento</option>
+                    <option value="Negócios">Negócios</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Arte">Arte</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateRoom}
+                  disabled={!newRoom.title.trim() || !newRoom.description.trim()}
+                  className="flex-1 px-4 py-2 bg-orkut-blue text-white rounded-lg hover:bg-orkut-blue-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Criar Sala
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

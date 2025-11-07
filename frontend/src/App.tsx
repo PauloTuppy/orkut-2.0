@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { OrkutProfile as OrkutProfileComponent } from './components/OrkutProfile';
-import { MSNChatWindow } from './components/MSNChatWindow';
-import { MessageCircle } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Communities from './pages/Communities';
 import Chat from './pages/Chat';
@@ -31,21 +28,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // Main Layout Component
 function MainLayout() {
-  const [showChat, setShowChat] = useState(false);
 
   const mockUser = {
     name: 'Vinicius Junior',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ViniciusJunior&backgroundColor=b6e3f4&clothesColor=262e33&eyebrowType=default&eyeType=default&facialHairColor=2c1b18&facialHairType=blank&hairColor=2c1b18&hatColor=3c4f5c&mouthType=smile&skinColor=ae5d29&topType=shortHairShortFlat',
-    friends: 150,
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ViniciusJuniorMale&backgroundColor=b6e3f4&clothesColor=262e33&eyebrowType=defaultNatural&eyeType=default&facialHairColor=2c1b18&facialHairType=beardMedium&hairColor=2c1b18&hatColor=3c4f5c&mouthType=smile&skinColor=ae5d29&topType=shortHairShortFlat&accessoriesType=blank',
+    friends: 100000,
     fans: 80,
     views: 999,
-    rating: 5
+    rating: 5,
+    relationship: 'Casado 💍'
   };
 
-  const mockContact = {
-    name: 'João Silva',
-    status: 'Online'
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -96,23 +90,7 @@ function MainLayout() {
         </div>
       </div>
 
-      {/* Floating Chat Button */}
-      {!showChat && (
-        <button
-          onClick={() => setShowChat(true)}
-          className="fixed bottom-4 right-4 bg-msn-green text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition z-40"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </button>
-      )}
 
-      {/* MSN Chat Window */}
-      {showChat && (
-        <MSNChatWindow
-          contact={mockContact}
-          onClose={() => setShowChat(false)}
-        />
-      )}
     </div>
   );
 }
@@ -121,7 +99,12 @@ import DashboardWithWindows from "./pages/DashboardWithWindows";
 
 function App() {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />

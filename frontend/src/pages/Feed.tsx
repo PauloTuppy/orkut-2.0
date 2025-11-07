@@ -1,67 +1,168 @@
-import { useState } from 'react';
-import { Search, Filter, Bookmark, Share2, ExternalLink, Sparkles, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Bookmark, Share2, ExternalLink, Sparkles, Clock, Plus, Rss, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
+import aiService from '../services/aiService';
 
 interface FeedItem {
   id: string;
   title: string;
   description: string;
-  content: string;
-  image: string;
+  content?: string;
+  image?: string;
+  link: string;
   source: string;
-  category: string;
-  timestamp: string;
-  likes: number;
-  saved: boolean;
-  hasAISummary: boolean;
+  published?: string;
+  author?: string;
+  tags?: string[];
+  category?: string;
+  saved?: boolean;
+  hasAISummary?: boolean;
 }
 
-const FEED_ITEMS: FeedItem[] = [
-  {
-    id: '1',
-    title: 'Inteligência Artificial Revoluciona o Desenvolvimento',
-    description: 'Como a IA está mudando a forma como desenvolvemos software',
-    content: 'A inteligência artificial está transformando radicalmente o desenvolvimento de software...',
-    image: '🤖',
-    source: 'TechCrunch',
-    category: 'Tech',
-    timestamp: '2h atrás',
-    likes: 345,
-    saved: false,
-    hasAISummary: true
-  },
-  {
-    id: '2',
-    title: 'Brasil Campeão em Inovação de Startups',
-    description: 'Ecossistema de startups brasileiro cresce 150% em 2024',
-    content: 'O Brasil se consolida como um dos principais hubs de inovação...',
-    image: '🚀',
-    source: 'Exame',
-    category: 'Negócios',
-    timestamp: '4h atrás',
-    likes: 812,
-    saved: false,
-    hasAISummary: false
-  },
-  {
-    id: '3',
-    title: 'Novo Protocolo de Segurança em Blockchain',
-    description: 'Inovação promete revolucionar a criptografia',
-    content: 'Um novo protocolo de segurança baseado em blockchain...',
-    image: '🔐',
-    source: 'CoinDesk',
-    category: 'Cripto',
-    timestamp: '6h atrás',
-    likes: 567,
-    saved: false,
-    hasAISummary: true
-  }
-];
+interface RSSFeed {
+  name: string;
+  url: string;
+  category: string;
+  description: string;
+  language: string;
+  active?: boolean;
+}
+
+
 
 export default function Feed() {
-  const [items, setItems] = useState(FEED_ITEMS);
+  const [items, setItems] = useState<FeedItem[]>([]);
+  const [availableFeeds, setAvailableFeeds] = useState<RSSFeed[]>([]);
+  const [activeFeeds, setActiveFeeds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('todos');
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'magazine'>('list');
+  const [showAddFeed, setShowAddFeed] = useState(false);
+  const [newFeedUrl, setNewFeedUrl] = useState('');
+
+  // Load popular feeds on component mount
+  useEffect(() => {
+    loadPopularFeeds();
+  }, []);
+
+  const loadPopularFeeds = async () => {
+    try {
+      setLoading(true);
+      const response = await aiService.getPopularFeeds();
+      setAvailableFeeds(response.feeds);
+      
+      // Auto-activate first 3 feeds
+      const defaultFeeds = response.feeds.slice(0, 3).map((feed: RSSFeed) => feed.url);
+      setActiveFeeds(defaultFeeds);
+      
+      // Load content from default feeds
+      await loadFeedContent(defaultFeeds);
+    } catch (error) {
+      console.error('Erro ao carregar feeds:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFeedContent = async (feedUrls: string[]) => {
+    try {
+      setLoading(true);
+      const allItems: FeedItem[] = [];
+
+      for (const url of feedUrls) {
+        try {
+          const response = await aiService.fetchRSSFeed(url, 10);
+          const feedItems: FeedItem[] = response.items.map((item: any) => ({
+            ...item,
+            category: availableFeeds.find(f => f.url === url)?.category || 'Geral',
+            saved: false,
+            hasAISummary: Math.random() > 0.7 // Random AI summary for demo
+          }));
+          allItems.push(...feedItems);
+        } catch (error) {
+          console.error(`Erro ao carregar feed ${url}:`, error);
+        }
+      }
+
+      // Sort by published date
+      allItems.sort((a, b) => {
+        const dateA = new Date(a.published || 0);
+        const dateB = new Date(b.published || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+      setItems(allItems);
+    } catch (error) {
+      console.error('Erro ao carregar conteúdo dos feeds:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      setLoading(true);
+      const response = await aiService.searchRSSContent(searchQuery, activeFeeds);
+      const searchItems: FeedItem[] = response.results.map((item: any) => ({
+        ...item,
+        category: 'Busca',
+        saved: false,
+        hasAISummary: false
+      }));
+      setItems(searchItems);
+    } catch (error) {
+      console.error('Erro na busca:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addCustomFeed = async () => {
+    if (!newFeedUrl.trim()) return;
+
+    try {
+      setLoading(true);
+      const response = await aiService.fetchRSSFeed(newFeedUrl, 5);
+      
+      const newFeed: RSSFeed = {
+        name: response.feed_info.title,
+        url: newFeedUrl,
+        category: 'Personalizado',
+        description: response.feed_info.description,
+        language: response.feed_info.language || 'pt-br',
+        active: true
+      };
+
+      setAvailableFeeds([...availableFeeds, newFeed]);
+      setActiveFeeds([...activeFeeds, newFeedUrl]);
+      setNewFeedUrl('');
+      setShowAddFeed(false);
+
+      // Reload content
+      await loadFeedContent([...activeFeeds, newFeedUrl]);
+    } catch (error) {
+      console.error('Erro ao adicionar feed:', error);
+      alert('Erro ao adicionar feed. Verifique a URL e tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleFeed = async (feedUrl: string) => {
+    const newActiveFeeds = activeFeeds.includes(feedUrl)
+      ? activeFeeds.filter(url => url !== feedUrl)
+      : [...activeFeeds, feedUrl];
+    
+    setActiveFeeds(newActiveFeeds);
+    await loadFeedContent(newActiveFeeds);
+  };
+
+  const refreshFeeds = async () => {
+    await loadFeedContent(activeFeeds);
+  };
 
   const toggleSave = (id: string) => {
     setItems(
@@ -91,14 +192,81 @@ export default function Feed() {
             <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Buscar artigos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Buscar artigos em todos os feeds..."
               className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orkut-blue"
             />
           </div>
-          <button className="bg-orkut-blue text-white px-4 py-2 rounded-lg hover:bg-orkut-blue-dark transition flex items-center space-x-2">
-            <Filter className="w-5 h-5" />
+          <button 
+            onClick={handleSearch}
+            disabled={loading}
+            className="bg-orkut-blue text-white px-4 py-2 rounded-lg hover:bg-orkut-blue-dark transition flex items-center space-x-2 disabled:opacity-50"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={refreshFeeds}
+            disabled={loading}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center space-x-2 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+          <button 
+            onClick={() => setShowAddFeed(!showAddFeed)}
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition flex items-center space-x-2"
+          >
+            <Plus className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Add Custom Feed */}
+        {showAddFeed && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4"
+          >
+            <h3 className="font-semibold text-gray-900 mb-2">Adicionar Feed RSS</h3>
+            <div className="flex space-x-2">
+              <input
+                type="url"
+                value={newFeedUrl}
+                onChange={(e) => setNewFeedUrl(e.target.value)}
+                placeholder="https://exemplo.com/rss"
+                className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <button
+                onClick={addCustomFeed}
+                disabled={loading || !newFeedUrl.trim()}
+                className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 transition"
+              >
+                Adicionar
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Active Feeds */}
+        {availableFeeds.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {availableFeeds.map((feed) => (
+              <button
+                key={feed.url}
+                onClick={() => toggleFeed(feed.url)}
+                className={`px-3 py-1 rounded-full text-sm transition flex items-center space-x-1 ${
+                  activeFeeds.includes(feed.url)
+                    ? 'bg-orkut-blue text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                <Rss className="w-3 h-3" />
+                <span>{feed.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* View Modes */}
         <div className="flex items-center justify-between">
@@ -137,13 +305,41 @@ export default function Feed() {
         </div>
       </motion.div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin text-orkut-blue mx-auto mb-4" />
+            <p className="text-gray-600">Carregando feeds RSS...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && filteredItems.length === 0 && (
+        <div className="text-center py-12">
+          <Rss className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum artigo encontrado</h3>
+          <p className="text-gray-600 mb-4">
+            {searchQuery ? 'Tente uma busca diferente ou' : 'Adicione feeds RSS para começar ou'} 
+          </p>
+          <button
+            onClick={() => setShowAddFeed(true)}
+            className="bg-orkut-blue text-white px-6 py-2 rounded-lg hover:bg-orkut-blue-dark transition"
+          >
+            Adicionar Feed RSS
+          </button>
+        </div>
+      )}
+
       {/* Feed Items */}
-      <div
-        className={
-          viewMode === 'grid' ? 'grid grid-cols-2 gap-4' : 'space-y-4'
-        }
-      >
-        {filteredItems.map((item, index) => (
+      {!loading && filteredItems.length > 0 && (
+        <div
+          className={
+            viewMode === 'grid' ? 'grid grid-cols-2 gap-4' : 'space-y-4'
+          }
+        >
+          {filteredItems.map((item, index) => (
           <motion.article
             key={item.id}
             initial={{ opacity: 0, y: 20 }}
@@ -166,11 +362,11 @@ export default function Feed() {
             <div className="p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <span className="text-xs font-semibold text-orkut-blue bg-blue-50 px-2 py-1 rounded">
-                  {item.category}
+                  {item.category || 'Geral'}
                 </span>
                 <span className="text-xs text-gray-500 flex items-center">
                   <Clock className="w-3 h-3 mr-1" />
-                  {item.timestamp}
+                  {item.published ? new Date(item.published).toLocaleDateString('pt-BR') : 'Data não disponível'}
                 </span>
               </div>
 
@@ -182,7 +378,7 @@ export default function Feed() {
                 {item.description}
               </p>
 
-              {item.hasAISummary && (
+              {item.hasAISummary && item.content && (
                 <div className="bg-blue-50 border-l-4 border-orkut-blue p-3 mb-4 rounded">
                   <p className="text-xs text-gray-700">
                     <strong>Resumo IA:</strong> {item.content.substring(0, 80)}
@@ -210,7 +406,9 @@ export default function Feed() {
                     <Share2 className="w-4 h-4" />
                   </button>
                   <a
-                    href="#"
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-orkut-blue hover:text-orkut-blue-dark p-1"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -219,8 +417,9 @@ export default function Feed() {
               </div>
             </div>
           </motion.article>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

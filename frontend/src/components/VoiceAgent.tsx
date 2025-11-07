@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LiveKitRoom, useVoiceAssistant, BarVisualizer, RoomAudioRenderer } from '@livekit/components-react';
 import '@livekit/components-styles';
 
@@ -7,10 +7,10 @@ interface VoiceAgentProps {
   onClose?: () => void;
 }
 
-export const VoiceAgent: React.FC<VoiceAgentProps> = ({ 
+export const VoiceAgent = ({ 
   agentType = 'sales',
   onClose 
-}) => {
+}: VoiceAgentProps) => {
   const [token, setToken] = useState<string>('');
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string>('');
@@ -22,10 +22,14 @@ export const VoiceAgent: React.FC<VoiceAgentProps> = ({
     const getToken = async () => {
       setConnecting(true);
       try {
-        const response = await fetch('/api/agents/token', {
+        const response = await fetch('/api/ai/token?room_name=VoiceAgent&user_name=ViniciusJunior', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ agentType })
+          body: JSON.stringify({ 
+            room_name: 'VoiceAgent',
+            user_name: 'ViniciusJunior',
+            agentType 
+          })
         });
         
         if (!response.ok) throw new Error('Failed to get token');

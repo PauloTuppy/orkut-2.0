@@ -54,22 +54,13 @@ export function Header() {
                 <span>Comunidades</span>
               </Link>
               <Link 
-                to="/chat" 
-                className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
-                  isActive('/chat') ? 'text-orkut-pink' : ''
-                }`}
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span>Chat</span>
-              </Link>
-              <Link 
                 to="/chat-msn" 
                 className={`flex items-center space-x-2 hover:text-orkut-pink transition ${
                   isActive('/chat-msn') ? 'text-orkut-pink' : ''
                 }`}
               >
                 <MessageCircle className="w-5 h-5" />
-                <span>MSN</span>
+                <span>Chat MSN</span>
               </Link>
               <Link 
                 to="/feed" 

@@ -35,13 +35,13 @@ export default function OrkutProfile() {
 
   const user = {
     name: 'Vinicius Junior',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ViniciusJunior&backgroundColor=b6e3f4&clothesColor=262e33&eyebrowType=default&eyeType=default&facialHairColor=2c1b18&facialHairType=blank&hairColor=2c1b18&hatColor=3c4f5c&mouthType=smile&skinColor=ae5d29&topType=shortHairShortFlat',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ViniciusJuniorMale&backgroundColor=b6e3f4&clothesColor=262e33&eyebrowType=defaultNatural&eyeType=default&facialHairColor=2c1b18&facialHairType=beardMedium&hairColor=2c1b18&hatColor=3c4f5c&mouthType=smile&skinColor=ae5d29&topType=shortHairShortFlat&accessoriesType=blank',
     age: 24,
     location: 'Madrid, Espanha 🇪🇸',
-    relationship: 'Solteiro',
+    relationship: 'Casado 💍',
     profession: 'Jogador de Futebol Profissional',
-    about: 'Jogador do Real Madrid e da Seleção Brasileira! Apaixonado por futebol e tecnologia. Sempre em busca da excelência dentro e fora de campo! ⚽💜',
-    friends: 150,
+    about: 'Jogador do Real Madrid e da Seleção Brasileira! Casado e apaixonado por futebol e tecnologia. Sempre em busca da excelência dentro e fora de campo! ⚽💜👨‍👩‍👧‍👦',
+    friends: 100000,
     fans: 89,
     views: 2847,
     rating: 5,
@@ -217,7 +217,7 @@ export default function OrkutProfile() {
                   <h2 className="profile-name">{user.name}</h2>
                   <p className="profile-location">{user.location}</p>
                   <div className="profile-stats">
-                    <span>👥 {user.friends} amigos</span>
+                    <span>👥 {user.friends >= 1000 ? (user.friends / 1000).toFixed(0) + 'K' : user.friends} amigos</span>
                     <span>⭐ {user.fans} fãs</span>
                     <span>👁️ {user.views} visitas</span>
                   </div>
