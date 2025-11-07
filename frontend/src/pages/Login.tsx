@@ -18,14 +18,28 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Usar proxy do Vite em vez de URL direta
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password })
-      });
+      // Tentar proxy primeiro, depois URL direta (fallback rápido)
+      let response;
+      try {
+        response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+          signal: AbortSignal.timeout(3000) // Timeout de 3 segundos
+        });
+      } catch (proxyError) {
+        console.log('Proxy failed, trying direct connection...');
+        // Fallback para conexão direta
+        response = await fetch('http://localhost:8000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password })
+        });
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -41,8 +55,8 @@ export default function Login() {
       // Efeito de sucesso
       setError('');
       
-      // Navegar para dashboard
-      setTimeout(() => navigate('/'), 500);
+      // Navegar para dashboard imediatamente
+      navigate('/');
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Erro ao fazer login. Verifique suas credenciais.');
