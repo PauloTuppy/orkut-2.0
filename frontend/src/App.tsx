@@ -34,8 +34,8 @@ function MainLayout() {
   const [showChat, setShowChat] = useState(false);
 
   const mockUser = {
-    name: 'Paulo Tuppy',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Paulo',
+    name: 'Vinicius Junior',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ViniciusJunior&backgroundColor=b6e3f4&clothesColor=262e33&eyebrowType=default&eyeType=default&facialHairColor=2c1b18&facialHairType=blank&hairColor=2c1b18&hatColor=3c4f5c&mouthType=smile&skinColor=ae5d29&topType=shortHairShortFlat',
     friends: 150,
     fans: 80,
     views: 999,
@@ -117,6 +117,8 @@ function MainLayout() {
   );
 }
 
+import DashboardWithWindows from "./pages/DashboardWithWindows";
+
 function App() {
   return (
     <Router>
@@ -124,8 +126,12 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Desktop-like experience */}
+        <Route path="/chat-msn-desktop" element={<ChatMSN />} />
+        <Route path="/dashboard-windows" element={<DashboardWithWindows />} />
         
-        {/* Protected Routes */}
+        {/* Protected Routes with Main Layout */}
         <Route
           path="/*"
           element={

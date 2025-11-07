@@ -25,6 +25,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "^1.0.22",
     "@types/dompurify": "^3.0.5",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
@@ -36,7 +37,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.16",
+    "tailwindcss": "^3.4.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }

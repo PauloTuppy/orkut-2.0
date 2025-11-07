@@ -34,13 +34,13 @@ export default function OrkutProfile() {
   const [maxZIndex, setMaxZIndex] = useState(1000);
 
   const user = {
-    name: 'Paulo Tuppy',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Paulo',
-    age: 28,
-    location: 'São Paulo, Brasil 🇧🇷',
+    name: 'Vinicius Junior',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ViniciusJunior&backgroundColor=b6e3f4&clothesColor=262e33&eyebrowType=default&eyeType=default&facialHairColor=2c1b18&facialHairType=blank&hairColor=2c1b18&hatColor=3c4f5c&mouthType=smile&skinColor=ae5d29&topType=shortHairShortFlat',
+    age: 24,
+    location: 'Madrid, Espanha 🇪🇸',
     relationship: 'Solteiro',
-    profession: 'Desenvolvedor Full Stack',
-    about: 'Apaixonado por tecnologia e nostalgia! Criando o Orkut 2.0 com muito carinho. Saudades dos tempos dourados da internet brasileira! 💜',
+    profession: 'Jogador de Futebol Profissional',
+    about: 'Jogador do Real Madrid e da Seleção Brasileira! Apaixonado por futebol e tecnologia. Sempre em busca da excelência dentro e fora de campo! ⚽💜',
     friends: 150,
     fans: 89,
     views: 2847,

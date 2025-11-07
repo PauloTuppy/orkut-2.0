@@ -1,142 +1,115 @@
-/* src/components/WindowFrame.css */
+:root {
+  --win95-grey: #c0c0c0;
+  --win95-white: #ffffff;
+  --win95-black: #000000;
+  --win95-blue: #000080;
+  --win95-light-grey: #dfdfdf;
+  --win95-dark-grey: #808080;
+}
 
 .window-frame {
-  position: fixed;
-  background: #c0c0c0;
-  border: 2px solid;
-  border-color: #dfdfdf #808080 #808080 #dfdfdf;
-  box-shadow: 
-    inset 1px 1px 0 #ffffff,
-    inset -1px -1px 0 #404040,
-    2px 2px 8px rgba(0, 0, 0, 0.3);
-  font-family: 'MS Sans Serif', Arial, sans-serif;
-  font-size: 11px;
+  position: absolute;
+  border: 2px solid var(--win95-light-grey);
+  border-right-color: var(--win95-dark-grey);
+  border-bottom-color: var(--win95-dark-grey);
+  background-color: var(--win95-grey);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  user-select: none;
-}
-
-.window-titlebar {
-  background: linear-gradient(to right, #000080, #1084d7);
-  color: white;
-  padding: 2px 3px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: move;
-  user-select: none;
-  height: 20px;
-  min-height: 20px;
-}
-
-.titlebar-content {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: bold;
+  font-family: "MS Sans Serif", Arial, sans-serif;
   font-size: 11px;
-  overflow: hidden;
-}
-
-.window-icon {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.window-title {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.titlebar-buttons {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.window-button {
-  width: 16px;
-  height: 14px;
-  padding: 0;
-  border: 1px solid;
-  border-color: #dfdfdf #404040 #404040 #dfdfdf;
-  background: #c0c0c0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 10px;
-  color: black;
-}
-
-.window-button:active {
-  border-color: #404040 #dfdfdf #dfdfdf #404040;
-  padding-top: 1px;
-  padding-left: 1px;
-}
-
-.window-button.close:hover {
-  background: #ff0000;
-  color: white;
-}
-
-.window-button.minimize:hover,
-.window-button.maximize:hover {
-  background: #dfdfdf;
-}
-
-.window-content {
-  flex: 1;
-  overflow: auto;
-  background: #c0c0c0;
-  padding: 2px;
-  min-height: 0;
-}
-
-.window-frame.minimized {
-  height: auto !important;
-}
-
-.window-frame.minimized .window-content {
-  display: none;
 }
 
 .window-frame.maximized {
   left: 0 !important;
   top: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border: none;
 }
 
-/* Scrollbars estilo Windows 95 */
-.window-content::-webkit-scrollbar {
+.window-frame.minimized .content {
+  display: none;
+}
+
+.title-bar {
+  background: linear-gradient(to right, var(--win95-blue), #1e90ff);
+  color: var(--win95-white);
+  padding: 3px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.icon {
+  margin-right: 5px;
+}
+
+.buttons {
+  display: flex;
+}
+
+.buttons button {
+  background-color: var(--win95-grey);
+  border: 1px solid var(--win95-light-grey);
+  border-right-color: var(--win95-dark-grey);
+  border-bottom-color: var(--win95-dark-grey);
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.buttons button:active {
+  border-top-color: var(--win95-dark-grey);
+  border-left-color: var(--win95-dark-grey);
+  border-right-color: var(--win95-light-grey);
+  border-bottom-color: var(--win95-light-grey);
+}
+
+.content {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: var(--win95-white);
+  border: 1px solid var(--win95-dark-grey);
+  margin: 3px;
+  overflow: auto;
+}
+
+/* Classic Scrollbar */
+.content::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
 
-.window-content::-webkit-scrollbar-track {
-  background: #c0c0c0;
-  border: 1px solid;
-  border-color: #dfdfdf #404040 #404040 #dfdfdf;
+.content::-webkit-scrollbar-track {
+  background-color: var(--win95-light-grey);
 }
 
-.window-content::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
-  border: 2px solid;
-  border-color: #dfdfdf #404040 #404040 #dfdfdf;
+.content::-webkit-scrollbar-thumb {
+  background-color: var(--win95-grey);
+  border: 1px solid var(--win95-light-grey);
+  border-right-color: var(--win95-dark-grey);
+  border-bottom-color: var(--win95-dark-grey);
 }
 
-.window-content::-webkit-scrollbar-thumb:hover {
-  background: #dfdfdf;
-}
-
-.window-content::-webkit-scrollbar-corner {
-  background: #c0c0c0;
+.content::-webkit-scrollbar-button {
+  background-color: var(--win95-grey);
+  border: 1px solid var(--win95-light-grey);
+  border-right-color: var(--win95-dark-grey);
+  border-bottom-color: var(--win95-dark-grey);
+  display: block;
+  height: 16px;
+  width: 16px;
 }

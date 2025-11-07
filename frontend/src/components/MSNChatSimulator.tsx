@@ -223,7 +223,7 @@ export default function MSNChatSimulator() {
           <div className="msn-user-info">
             <div className="user-avatar">👤</div>
             <div className="user-details">
-              <div className="user-name">Paulo Tuppy</div>
+              <div className="user-name">Vinicius Junior</div>
               <div className="user-status">🟢 Online</div>
             </div>
           </div>

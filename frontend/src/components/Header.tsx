@@ -157,7 +157,7 @@ export function Header() {
               <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center">
                 👤
               </div>
-              <span className="hidden md:block">Paulo Tuppy</span>
+              <span className="hidden md:block">Vinicius Junior</span>
               <ChevronDown className="w-4 h-4" />
             </button>
 

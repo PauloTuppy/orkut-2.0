@@ -117,14 +117,11 @@ async def preflight(full_path: str):
     }
 
 # Import routes
-try:
-    from app.routes import auth, communities, messages, feeds
-    app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-    app.include_router(communities.router, prefix="/api/communities", tags=["communities"])
-    app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
-    app.include_router(feeds.router, prefix="/api/feeds", tags=["feeds"])
-except ImportError as e:
-    logger.warning(f"Could not import routes: {e}")
+from app.routes import auth, communities, messages, feeds
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(communities.router, prefix="/api/communities", tags=["communities"])
+app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
+app.include_router(feeds.router, prefix="/api/feeds", tags=["feeds"])
 
 # Import AI routes
 try:

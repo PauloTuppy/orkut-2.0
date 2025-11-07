@@ -179,9 +179,9 @@ const DEMO_RESPONSES = [
 ### Usuário Principal
 ```typescript
 const user = {
-  name: 'Paulo Tuppy',
-  age: 28,
-  location: 'São Paulo, Brasil 🇧🇷',
+  name: 'Vinicius Junior',
+  age: 24,
+  location: 'Madrid, Espanha 🇪🇸',
   profession: 'Desenvolvedor Full Stack',
   friends: 150,
   fans: 89,

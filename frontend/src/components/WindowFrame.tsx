@@ -1,5 +1,4 @@
-// src/components/WindowFrame.tsx
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X, Minus, Square } from 'lucide-react';
 import './WindowFrame.css';
@@ -41,30 +40,6 @@ export default function WindowFrame({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const windowRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-      setPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y
-      });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
-
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('[data-no-drag]')) return;
     
@@ -74,79 +49,56 @@ export default function WindowFrame({
       y: e.clientY - position.y
     });
     
+    // Call onFocus when window is clicked
     onFocus?.();
   };
 
-  const handleDoubleClick = () => {
-    if (maximizable) {
-      setIsMaximized(!isMaximized);
-    }
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    setPosition({
+      x: e.clientX - dragOffset.x,
+      y: e.clientY - dragOffset.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   return (
     <motion.div
       ref={windowRef}
-      className={`window-frame ${isMinimized ? 'minimized' : ''} ${isMaximized ? 'maximized' : ''}`}
+      className={`window-frame ${isMaximized ? 'maximized' : ''} ${isMinimized ? 'minimized' : ''}`}
       style={{
-        left: isMaximized ? 0 : `${position.x}px`,
-        top: isMaximized ? 0 : `${position.y}px`,
-        width: isMaximized ? '100%' : `${size.width}px`,
-        height: isMaximized ? '100%' : isMinimized ? 'auto' : `${size.height}px`,
-        zIndex
+        left: position.x,
+        top: position.y,
+        width: isMaximized ? '100%' : size.width,
+        height: isMaximized ? '100%' : size.height,
+        zIndex: zIndex,
       }}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
       onClick={onFocus}
+      drag={!isMaximized}
+      dragMomentum={false}
+      dragConstraints={{ left: 0, top: 0, right: window.innerWidth - size.width, bottom: window.innerHeight - size.height }}
     >
-      {/* Title Bar */}
-      <div
-        className="window-titlebar"
-        onMouseDown={handleMouseDown}
-        onDoubleClick={handleDoubleClick}
-      >
-        <div className="titlebar-content">
-          <span className="window-icon">{icon}</span>
-          <span className="window-title">{title}</span>
+      <div className="title-bar" onMouseDown={handleMouseDown}>
+        <div className="title">
+          <span className="icon">{icon}</span>
+          {title}
         </div>
-        
-        <div className="titlebar-buttons" data-no-drag>
-          {minimizable && (
-            <button
-              className="window-button minimize"
-              onClick={() => setIsMinimized(!isMinimized)}
-              title="Minimizar"
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-          )}
-          
-          {maximizable && (
-            <button
-              className="window-button maximize"
-              onClick={() => setIsMaximized(!isMaximized)}
-              title="Maximizar"
-            >
-              <Square className="w-3 h-3" />
-            </button>
-          )}
-          
-          <button
-            className="window-button close"
-            onClick={onClose}
-            title="Fechar"
-          >
-            <X className="w-3 h-3" />
-          </button>
+        <div className="buttons" data-no-drag>
+          {minimizable && <button onClick={() => setIsMinimized(!isMinimized)}><Minus size={14} /></button>}
+          {maximizable && <button onClick={() => setIsMaximized(!isMaximized)}><Square size={14} /></button>}
+          {onClose && <button onClick={onClose}><X size={14} /></button>}
         </div>
       </div>
-
-      {/* Content */}
-      {!isMinimized && (
-        <div className="window-content">
-          {children}
-        </div>
-      )}
+      <div className="content">
+        {!isMinimized && children}
+      </div>
     </motion.div>
   );
 }
