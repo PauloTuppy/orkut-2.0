@@ -2,20 +2,30 @@
 
 Modern social network inspired by classic Orkut, built with cutting-edge technologies and ready to scale.
 
+**Status:** 🟢 ONLINE | **Version:** 2.0.0 | **Last Update:** Nov 2025
+
 ## ✨ Features
 
-- 🔐 Secure JWT authentication
-- 👥 Friends and communities system
-- 💬 Real-time chat (WebSockets + MSN Messenger style)
-- 📝 Posts and testimonials
-- 🤖 Integrated AI (Gemini API + Cerebras LLM)
-- 🎤 Voice AI Agents (LiveKit + Cartesia)
-- 📰 RSS Feed Reader with Gist Memory
-- 🎙️ Audio Rooms (Clubhouse style)
-- 📁 P2P File Sharing (Napster style)
-- ⚡ Smart caching with KeyDB
-- 🗄️ SmartSQL for optimized queries
-- 📊 Monitoring and logging
+### Core Features
+- 🔐 **Secure Authentication** - JWT with bcrypt hashing
+- 👥 **Communities** - Create and join communities
+- 💬 **MSN-Style Chat** - Real-time messaging with Windows XP design
+- 📝 **Posts & Comments** - Social feed with interactions
+- 🎨 **Orkut Profile** - Classic profile with testimonials
+
+### AI-Powered Features
+- 🧠 **Gist Memory** - AI document analysis with PDF upload (NEW!)
+- 🤖 **Smart Summaries** - Automatic document summarization
+- 💬 **Q&A System** - Ask questions about your documents
+- 🎤 **Voice AI Agents** - LiveKit + Cartesia voice chat
+- 📊 **Document Analysis** - Word count, topics, complexity
+
+### Modern Features
+- 📰 **RSS Feed Reader** - Aggregate news from multiple sources
+- 🎙️ **Audio Rooms** - Clubhouse-style voice rooms
+- 📁 **P2P File Sharing** - Napster-style file sharing with streaming
+- ⚡ **Smart Caching** - KeyDB for ultra-fast responses
+- 🔒 **Enterprise Security** - Rate limiting, input validation, CORS
 
 ## 🛠️ Tech Stack
 
@@ -52,67 +62,144 @@ Modern social network inspired by classic Orkut, built with cutting-edge technol
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Docker & Docker Compose
-- Node.js 20+ (for local development)
-- Python 3.11+ (for local development)
+- **Python 3.12+** (for backend)
+- **Node.js 20+** (for frontend)
+- **pip** (Python package manager)
+- **npm** (Node package manager)
 
-### Installation
+### ⚡ Super Fast Setup (Windows)
 
-```bash
-# Clone the repository
+```powershell
+# 1. Clone the repository
 git clone https://github.com/your-username/orkut-2.0.git
 cd orkut-2.0
 
-# Configure environment variables
-cp .env.example .env
-# Edit .env with your settings
-
-# Start with Docker Compose
-docker compose up -d
-
-# Run migrations
-docker compose exec backend alembic upgrade head
+# 2. Start everything automatically
+.\start-all.ps1
 ```
 
-### Access
+That's it! The script will:
+- ✅ Check dependencies
+- ✅ Install packages if needed
+- ✅ Start backend (port 8000)
+- ✅ Start frontend (port 3000)
+- ✅ Open browser automatically
+
+### 🔧 Manual Setup
+
+#### Backend
+```powershell
+cd backend
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+#### Frontend
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+### 🎮 Access
 
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:8000
 - **API Docs:** http://localhost:8000/docs
-- **PostgreSQL:** localhost:5432
-- **KeyDB:** localhost:6380
+- **Health Check:** http://localhost:8000/health
+
+### 🔑 Demo Credentials
+
+```
+Email: demo@orkut.com
+Password: demo123
+```
 
 ## 📚 Documentation
 
+### Getting Started
+- [Quick Commands](./QUICK-COMMANDS.md) - Essential commands
 - [Quickstart](./QUICKSTART.md) - Get started in 5 minutes
-- [Deploy Guide](./DEPLOY.md) - Complete deployment guide
-- [Voice Agent Setup](./VOICE-AGENT-SETUP.md) - LiveKit voice agents guide
-- [Security Guide](./SECURITY.md) - Security documentation
+- [Troubleshooting](./TROUBLESHOOT-FAILED-TO-FETCH.md) - Fix common errors
+
+### Features
+- [Gist Memory Guide](./GIST-MEMORY-WORKING.md) - AI document analysis (NEW!)
+- [Chat MSN Guide](./CHAT-MSN-COMPLETO-GUIDE.md) - MSN-style chat
+- [P2P Share Guide](./P2P-SHARE-GUIDE.md) - File sharing
+- [Communities Guide](./COMUNIDADES-GUIDE.md) - Communities system
+- [Voice Agent Setup](./VOICE-AGENT-SETUP.md) - LiveKit voice agents
+
+### Security
+- [Security Guide](./SECURITY.md) - Complete security documentation
 - [Security Checklist](./SECURITY-CHECKLIST.md) - Pre-deployment checklist
 - [Security Best Practices](./docs/SECURITY-BEST-PRACTICES.md) - Developer guide
-- [API Docs](http://localhost:8000/docs) - Interactive documentation
-- [Voice Agent Docs](./orkut-voice-agent/README.md) - Voice agent documentation
+
+### Deployment
+- [Deploy Guide](./DEPLOY.md) - Complete deployment guide
+- [GCP Setup](./GCP-SETUP.md) - Google Cloud Platform
+- [API Docs](http://localhost:8000/docs) - Interactive API documentation
 
 ## 🧪 Testing
 
-```bash
-# Backend
-docker compose exec backend pytest
+### Quick Tests
 
-# Frontend
-docker compose exec frontend npm test
+```powershell
+# Test Gist Memory (PDF upload & analysis)
+.\test-gist-memory.ps1
 
-# Lint
-docker compose exec backend flake8 app
-docker compose exec frontend npm run lint
+# Test AI endpoints
+.\test-ai-endpoints.ps1
+
+# Test P2P upload
+.\test-p2p-upload.ps1
+```
+
+### Manual Tests
+
+```powershell
+# Backend health
+curl http://localhost:8000/health
+
+# Frontend health
+curl http://localhost:3000
+
+# Test login
+curl -X POST http://localhost:8000/api/auth/login `
+  -H "Content-Type: application/json" `
+  -d '{"email":"demo@orkut.com","password":"demo123"}'
 ```
 
 ## 🔧 Development
 
-### Backend
+### Useful Scripts
 
-```bash
+```powershell
+# Start everything
+.\start-all.ps1
+
+# Start backend only
+.\start-backend.ps1
+
+# Start frontend only
+.\start-frontend.ps1
+
+# Test Gist Memory
+.\test-gist-memory.ps1
+
+# Test AI endpoints
+.\test-ai-endpoints.ps1
+```
+
+### Backend Development
+
+```powershell
 cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run server
+python -m uvicorn app.main:app --reload
 
 # Create migration
 alembic revision --autogenerate -m "description"
@@ -124,9 +211,9 @@ alembic upgrade head
 alembic downgrade -1
 ```
 
-### Frontend
+### Frontend Development
 
-```bash
+```powershell
 cd frontend
 
 # Install dependencies
@@ -137,6 +224,12 @@ npm run dev
 
 # Build
 npm run build
+
+# Type check
+npm run type-check
+
+# Lint
+npm run lint
 ```
 
 ## 🚀 Deployment
@@ -186,22 +279,50 @@ curl http://localhost:8000/health
 curl http://localhost:3000/health
 ```
 
-## 🤖 Gemini API
+## 🧠 Gist Memory - AI Document Analysis
 
-### Configuration
+### Features
+- 📄 **PDF Upload** - Drag & drop or click to upload (max 50MB)
+- 🔍 **Text Extraction** - Automatic text extraction with PyPDF2/pdfplumber
+- 📊 **Smart Analysis** - Word count, topics, complexity, reading time
+- 🏷️ **Topic Detection** - Automatic keyword extraction
+- 💡 **Key Phrases** - Important sentences identification
+- 📑 **Section Detection** - Intelligent document segmentation
+- 🤖 **AI Summaries** - Powered by Cerebras LLaMA 3.3 70B
+- 💬 **Q&A System** - Ask questions about your documents
 
-1. Get API Key: https://makersuite.google.com/app/apikey
-2. Add to `.env`: `GOOGLE_GEMINI_API_KEY=your-key`
-3. Restart: `docker compose restart backend`
+### How to Use
 
-### Usage
+1. **Access Gist Memory**
+   ```
+   http://localhost:3000/dashboard → Click "🧠 Gist Memory"
+   ```
 
-```python
-# backend/app/services/gemini.py
-from app.services.gemini import summarize_text
+2. **Upload PDF**
+   - Drag & drop a PDF file
+   - Or click "📁 Select PDF"
+   - Wait for processing
 
-summary = await summarize_text("Your text here...")
-```
+3. **View Analysis**
+   - Document metrics (words, paragraphs, reading time)
+   - Main topics and key phrases
+   - Identified sections
+
+4. **Generate Summaries**
+   - Click "🚀 Generate Summaries"
+   - Get AI-powered summaries for each section
+
+5. **Ask Questions**
+   - Type your question
+   - Get contextual answers from the document
+
+### Supported Formats
+- ✅ PDF with selectable text
+- ✅ Max size: 50MB
+- ❌ Scanned PDFs (need OCR)
+- ❌ Protected/encrypted PDFs
+
+See [GIST-MEMORY-WORKING.md](./GIST-MEMORY-WORKING.md) for complete guide.
 
 ## 🏗️ Architecture
 
@@ -230,28 +351,33 @@ orkut-2.0/
 
 ## 🔐 Security
 
-- ✅ JWT authentication with expiration
-- ✅ Password hashing (Bcrypt, 12 rounds)
-- ✅ CORS whitelist (no wildcard)
-- ✅ SQL injection protection (parameterized queries)
-- ✅ XSS protection (HTML sanitization)
-- ✅ Rate limiting (60 req/min, 5 login attempts/5min)
-- ✅ Input validation (Zod + Pydantic)
-- ✅ Secure error handling
-- ✅ API keys protected (backend proxy only)
-- ✅ HTTPS in production
-- ✅ Security audit scripts
+### Implemented Security Measures
+- ✅ **JWT Authentication** - Secure token-based auth with expiration
+- ✅ **Password Hashing** - Bcrypt with 12 rounds
+- ✅ **CORS Whitelist** - No wildcard, explicit origins only
+- ✅ **SQL Injection Protection** - Parameterized queries (SQLAlchemy)
+- ✅ **XSS Protection** - HTML sanitization (DOMPurify)
+- ✅ **Rate Limiting** - 60 req/min global, 5 login attempts/5min
+- ✅ **Input Validation** - Zod (frontend) + Pydantic (backend)
+- ✅ **Secure Error Handling** - No sensitive data in errors
+- ✅ **API Keys Protected** - Backend proxy only, never exposed
+- ✅ **HTTPS in Production** - TLS 1.3
+- ✅ **Security Headers** - CSP, HSTS, X-Frame-Options
+- ✅ **File Upload Validation** - Type, size, content checks
 
-**Run security audit:**
-```bash
-# Linux/macOS
-./scripts/security-audit.sh
+### Security Audit
 
+```powershell
 # Windows
 .\scripts\security-audit.ps1
+
+# Linux/macOS
+./scripts/security-audit.sh
 ```
 
-See [SECURITY.md](./SECURITY.md) for complete security documentation.
+### Security Score: A+ 🛡️
+
+See [SECURITY.md](./SECURITY.md) for complete documentation.
 
 ## 📈 Performance
 
@@ -281,12 +407,85 @@ MIT License - see [LICENSE](LICENSE) for details.
 - React for the UI library
 - Google Gemini for AI
 
+## 🐛 Troubleshooting
+
+### "Failed to fetch" Error
+**Problem:** Frontend can't connect to backend
+
+**Solution:**
+```powershell
+# Check if backend is running
+curl http://localhost:8000/health
+
+# If not, start it
+.\start-backend.ps1
+```
+
+See [TROUBLESHOOT-FAILED-TO-FETCH.md](./TROUBLESHOOT-FAILED-TO-FETCH.md) for complete guide.
+
+### PDF Upload Not Working
+**Problem:** "PDF processing libraries not installed"
+
+**Solution:**
+```powershell
+cd backend
+pip install PyPDF2 pdfplumber
+# Restart backend
+```
+
+See [GIST-MEMORY-WORKING.md](./GIST-MEMORY-WORKING.md) for complete guide.
+
+### Port Already in Use
+**Problem:** Port 8000 or 3000 already in use
+
+**Solution:**
+```powershell
+# Find process using port
+netstat -ano | findstr :8000
+
+# Kill process (replace <PID>)
+taskkill /PID <PID> /F
+```
+
+### Common Issues
+- ❌ Backend not running → Run `.\start-backend.ps1`
+- ❌ Frontend not running → Run `.\start-frontend.ps1`
+- ❌ Dependencies missing → Run `pip install -r requirements.txt` and `npm install`
+- ❌ CORS error → Check `backend/.env` has correct origins
+- ❌ PDF not extracting → Use PDF with selectable text (not scanned)
+
 ## 📞 Support
 
-- 📧 Email: your-email@example.com
-- 💬 Discord: [Server link]
 - 🐛 Issues: [GitHub Issues](https://github.com/your-username/orkut-2.0/issues)
+- 📚 Docs: See documentation links above
+- 💬 Discussions: [GitHub Discussions](https://github.com/your-username/orkut-2.0/discussions)
+
+## 🎯 Roadmap
+
+### ✅ Completed
+- [x] Core authentication and authorization
+- [x] Communities system
+- [x] MSN-style chat
+- [x] Gist Memory with PDF upload
+- [x] AI document analysis
+- [x] P2P file sharing
+- [x] Audio rooms
+- [x] RSS feed reader
+- [x] Security hardening
+
+### 🚧 In Progress
+- [ ] OCR for scanned PDFs
+- [ ] Mobile app (React Native)
+- [ ] Video calls
+- [ ] Stories feature
+
+### 📋 Planned
+- [ ] Multi-language support
+- [ ] Dark mode
+- [ ] Advanced analytics
+- [ ] Marketplace
+- [ ] API v2
 
 ---
 
-Made with ❤️ and ☕
+Made with ❤️ and ☕ | **Orkut 2.0** - The social network you always wanted
