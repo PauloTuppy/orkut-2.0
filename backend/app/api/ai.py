@@ -867,15 +867,28 @@ async def upload_file(file: UploadFile = File(...), category: str = "general", d
     try:
         # Validate file type
         allowed_types = {
-            'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 
-            'audio/mp4', 'audio/m4a', 'audio/x-m4a', 'audio/aac',
+            # Audio formats
+            'audio/mpeg', 'audio/mp3', 'audio/x-mpeg', 'audio/mpeg3',
+            'audio/wav', 'audio/x-wav', 'audio/wave',
+            'audio/ogg', 'audio/vorbis',
+            'audio/mp4', 'audio/m4a', 'audio/x-m4a', 'audio/mp4a-latm',
+            'audio/aac', 'audio/aacp', 'audio/x-aac',
+            'audio/flac', 'audio/x-flac',
+            # Video formats
             'video/mp4', 'video/avi', 'video/mkv',
+            # Document formats
             'application/pdf', 'text/plain', 'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         }
         
+        # Check if file type is allowed
         if file.content_type not in allowed_types:
-            raise HTTPException(status_code=400, detail=f"File type {file.content_type} not allowed")
+            # Log the rejected type for debugging
+            logger.warning(f"⚠️  Rejected file type: {file.content_type}")
+            raise HTTPException(
+                status_code=400, 
+                detail=f"File type '{file.content_type}' not allowed. Supported: MP3, WAV, OGG, M4A, AAC, FLAC"
+            )
         
         # Check file size (max 100MB)
         content = await file.read()
