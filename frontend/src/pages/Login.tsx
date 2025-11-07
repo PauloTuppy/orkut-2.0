@@ -18,28 +18,14 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Tentar proxy primeiro, depois URL direta (fallback rápido)
-      let response;
-      try {
-        response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-          signal: AbortSignal.timeout(3000) // Timeout de 3 segundos
-        });
-      } catch (proxyError) {
-        console.log('Proxy failed, trying direct connection...');
-        // Fallback para conexão direta
-        response = await fetch('http://localhost:8000/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password })
-        });
-      }
+      // Conexão direta - mais rápida e confiável
+      const response = await fetch('http://localhost:8000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -52,14 +38,13 @@ export default function Login() {
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('user_email', email);
       
-      // Efeito de sucesso
-      setError('');
+      console.log('✅ Login successful, redirecting...');
       
-      // Navegar para dashboard imediatamente
+      // Navegar para dashboard
       navigate('/');
     } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Erro ao fazer login. Verifique suas credenciais.');
+      console.error('❌ Login error:', err);
+      setError(err.message || 'Erro ao fazer login. Verifique se o backend está rodando.');
     } finally {
       setIsLoading(false);
     }

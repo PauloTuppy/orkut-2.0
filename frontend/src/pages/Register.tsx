@@ -30,28 +30,14 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      // Tentar proxy primeiro, depois URL direta (fallback rápido)
-      let response;
-      try {
-        response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name, email, password }),
-          signal: AbortSignal.timeout(3000) // Timeout de 3 segundos
-        });
-      } catch (proxyError) {
-        console.log('Proxy failed, trying direct connection...');
-        // Fallback para conexão direta
-        response = await fetch('http://localhost:8000/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name, email, password })
-        });
-      }
+      // Conexão direta - mais rápida e confiável
+      const response = await fetch('http://localhost:8000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password })
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -65,11 +51,13 @@ export default function Register() {
       localStorage.setItem('user_email', email);
       localStorage.setItem('user_name', name);
       
-      // Navegar para dashboard imediatamente
+      console.log('✅ Register successful, redirecting...');
+      
+      // Navegar para dashboard
       navigate('/');
     } catch (err: any) {
-      console.error('Register error:', err);
-      setError(err.message || 'Erro ao criar conta. Tente novamente.');
+      console.error('❌ Register error:', err);
+      setError(err.message || 'Erro ao criar conta. Verifique se o backend está rodando.');
     } finally {
       setIsLoading(false);
     }
