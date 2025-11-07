@@ -47,37 +47,177 @@ async def process_document_gist(request: DocumentRequest):
 
 
 def simulate_gist_memory(content: str, title: str) -> dict:
-    """Simulate Gist Memory processing"""
-    # Dividir conteúdo em páginas simuladas
+    """Advanced Gist Memory processing with intelligent analysis"""
+    import re
+    from collections import Counter
+    
+    # Análise avançada do documento
     words = content.split()
     total_words = len(words)
-    words_per_page = 500
-    total_pages = max(1, (total_words + words_per_page - 1) // words_per_page)
+    sentences = re.split(r'[.!?]+', content)
+    paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
     
-    # Gerar resumos simulados baseados no conteúdo
+    # Dividir em seções inteligentes
+    sections = extract_document_sections(content)
+    total_pages = max(1, len(sections))
+    
+    # Extrair tópicos principais
+    topics = extract_topics(content)
+    
+    # Gerar resumos inteligentes para cada seção
     gists = []
-    for i in range(total_pages):
-        start_idx = i * words_per_page
-        end_idx = min((i + 1) * words_per_page, total_words)
-        page_words = words[start_idx:end_idx]
-        
-        # Criar resumo baseado nas primeiras palavras da página
-        if len(page_words) > 10:
-            key_words = page_words[:10]
-            gist = f"Página {i+1}: Aborda temas relacionados a {' '.join(key_words[:5])}... Contém informações sobre {' '.join(key_words[5:10])} e conceitos relacionados."
-        else:
-            gist = f"Página {i+1}: Seção final do documento com {len(page_words)} palavras restantes."
-        
+    for i, section in enumerate(sections):
+        gist = generate_intelligent_summary(section, i + 1, topics)
         gists.append(gist)
     
-    logger.info(f"✅ Simulated Gist Memory: {total_pages} pages, {total_words} words")
+    logger.info(f"✅ Advanced Gist Memory: {total_pages} sections, {total_words} words, {len(topics)} topics")
     
     return {
         "total_pages": total_pages,
         "gists": gists,
+        "topics": topics,
+        "word_count": total_words,
+        "sentence_count": len([s for s in sentences if s.strip()]),
+        "paragraph_count": len(paragraphs),
         "simulation": True,
-        "message": "Resumos gerados com simulação (Cerebras API não configurada)"
+        "message": "Resumos gerados com análise inteligente avançada"
     }
+
+
+def extract_document_sections(content: str) -> list:
+    """Extract logical sections from document"""
+    import re
+    
+    # Padrões para identificar títulos/seções
+    title_patterns = [
+        r'^[A-Z][A-Z\s]{5,}$',  # Títulos em maiúsculas
+        r'^\d+\.\s+[A-Z].*$',   # Numeração (1. Título)
+        r'^[IVX]+\.\s+[A-Z].*$', # Numeração romana
+        r'^[A-Z][^.!?]*:$',     # Títulos com dois pontos
+        r'^\s*#{1,6}\s+.*$'     # Markdown headers
+    ]
+    
+    lines = content.split('\n')
+    sections = []
+    current_section = []
+    
+    for line in lines:
+        line_stripped = line.strip()
+        
+        # Verificar se é um título
+        is_title = any(re.match(pattern, line_stripped, re.MULTILINE) for pattern in title_patterns)
+        
+        if is_title and current_section:
+            # Salvar seção anterior
+            section_text = '\n'.join(current_section).strip()
+            if len(section_text.split()) > 20:  # Mínimo de 20 palavras
+                sections.append(section_text)
+            current_section = [line]
+        else:
+            current_section.append(line)
+    
+    # Adicionar última seção
+    if current_section:
+        section_text = '\n'.join(current_section).strip()
+        if len(section_text.split()) > 20:
+            sections.append(section_text)
+    
+    # Se não encontrou seções, dividir por parágrafos grandes
+    if len(sections) <= 1:
+        paragraphs = content.split('\n\n')
+        sections = [p.strip() for p in paragraphs if len(p.split()) > 50]
+    
+    # Se ainda não tem seções suficientes, dividir por tamanho
+    if len(sections) <= 1:
+        words = content.split()
+        chunk_size = max(200, len(words) // 5)  # Máximo 5 seções
+        sections = []
+        for i in range(0, len(words), chunk_size):
+            chunk = ' '.join(words[i:i + chunk_size])
+            sections.append(chunk)
+    
+    return sections[:10]  # Máximo 10 seções
+
+
+def extract_topics(content: str) -> list:
+    """Extract main topics from content using frequency analysis"""
+    import re
+    from collections import Counter
+    
+    # Palavras comuns a ignorar
+    stop_words = {
+        'que', 'de', 'a', 'o', 'e', 'do', 'da', 'em', 'um', 'para', 'é', 'com', 'não', 'uma', 'os', 'no', 'se', 'na', 'por', 'mais', 'das', 'dos', 'ao', 'aos', 'às', 'pela', 'pelo', 'pelos', 'pelas',
+        'the', 'of', 'and', 'a', 'to', 'in', 'is', 'you', 'that', 'it', 'he', 'was', 'for', 'on', 'are', 'as', 'with', 'his', 'they', 'i', 'at', 'be', 'this', 'have', 'from', 'or', 'one', 'had', 'by', 'word', 'but', 'not', 'what', 'all', 'were', 'we', 'when', 'your', 'can', 'said', 'there', 'each', 'which', 'she', 'do', 'how', 'their', 'if', 'will', 'up', 'other', 'about', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her', 'would', 'make', 'like', 'into', 'him', 'has', 'two', 'more', 'very', 'what', 'know', 'just', 'first', 'get', 'over', 'think', 'also', 'back', 'after', 'use', 'our', 'work', 'life', 'only', 'new', 'way', 'may', 'say'
+    }
+    
+    # Extrair palavras significativas
+    words = re.findall(r'\b[a-zA-ZÀ-ÿ]{3,}\b', content.lower())
+    significant_words = [word for word in words if word not in stop_words and len(word) > 3]
+    
+    # Contar frequências
+    word_freq = Counter(significant_words)
+    
+    # Extrair bigramas (pares de palavras)
+    bigrams = []
+    for i in range(len(significant_words) - 1):
+        bigram = f"{significant_words[i]} {significant_words[i+1]}"
+        bigrams.append(bigram)
+    
+    bigram_freq = Counter(bigrams)
+    
+    # Combinar palavras individuais e bigramas
+    top_words = [word for word, count in word_freq.most_common(10) if count > 1]
+    top_bigrams = [bigram for bigram, count in bigram_freq.most_common(5) if count > 1]
+    
+    topics = top_words + top_bigrams
+    return topics[:8]  # Máximo 8 tópicos
+
+
+def generate_intelligent_summary(section: str, section_num: int, topics: list) -> str:
+    """Generate intelligent summary for a section"""
+    import re
+    
+    words = section.split()
+    sentences = [s.strip() for s in re.split(r'[.!?]+', section) if s.strip()]
+    
+    # Identificar frases-chave
+    key_sentences = []
+    for sentence in sentences:
+        sentence_lower = sentence.lower()
+        # Priorizar frases com tópicos principais
+        topic_matches = sum(1 for topic in topics if topic.lower() in sentence_lower)
+        
+        # Priorizar frases com palavras indicativas
+        indicator_words = ['importante', 'fundamental', 'principal', 'essencial', 'resultado', 'conclusão', 'objetivo', 'método', 'processo', 'descoberta', 'evidência', 'análise', 'estudo', 'pesquisa', 'dados', 'informação']
+        indicator_matches = sum(1 for word in indicator_words if word in sentence_lower)
+        
+        if topic_matches > 0 or indicator_matches > 0:
+            key_sentences.append((sentence, topic_matches + indicator_matches))
+    
+    # Ordenar por relevância
+    key_sentences.sort(key=lambda x: x[1], reverse=True)
+    
+    # Construir resumo
+    if key_sentences:
+        main_sentence = key_sentences[0][0]
+        summary = f"Seção {section_num}: {main_sentence[:150]}..."
+        
+        # Adicionar contexto adicional
+        if len(key_sentences) > 1:
+            summary += f" Também aborda: {key_sentences[1][0][:100]}..."
+    else:
+        # Fallback: usar primeiras frases
+        if sentences:
+            summary = f"Seção {section_num}: {sentences[0][:150]}..."
+            if len(sentences) > 1:
+                summary += f" {sentences[1][:100]}..."
+        else:
+            summary = f"Seção {section_num}: Contém {len(words)} palavras sobre os temas do documento."
+    
+    # Adicionar estatísticas
+    summary += f" ({len(words)} palavras, {len(sentences)} frases)"
+    
+    return summary
 
 
 @router.post("/ask-question")
@@ -106,29 +246,143 @@ async def ask_question(request: QuestionRequest):
 
 
 def simulate_question_answer(question: str, context: str) -> str:
-    """Simulate AI question answering"""
-    # Análise simples baseada em palavras-chave
+    """Advanced AI question answering simulation"""
+    import re
+    from collections import Counter
+    
     question_lower = question.lower()
-    context_words = context.lower().split()
+    context_lower = context.lower()
     
-    # Respostas baseadas em palavras-chave comuns
-    if any(word in question_lower for word in ['o que', 'what', 'que é', 'define']):
-        return f"Com base no documento fornecido, posso identificar que o conteúdo aborda diversos temas. Para uma resposta mais específica sobre '{question}', seria necessário analisar seções específicas do texto. O documento contém aproximadamente {len(context_words)} palavras com informações relevantes."
+    # Extrair palavras-chave da pergunta
+    question_words = re.findall(r'\b[a-zA-ZÀ-ÿ]{3,}\b', question_lower)
+    question_keywords = [word for word in question_words if len(word) > 3]
     
-    elif any(word in question_lower for word in ['como', 'how', 'de que forma']):
-        return f"O documento apresenta metodologias e processos relacionados à sua pergunta '{question}'. Com base no conteúdo analisado, há indicações de procedimentos e abordagens que podem responder sua questão."
+    # Encontrar frases relevantes no contexto
+    sentences = [s.strip() for s in re.split(r'[.!?]+', context) if s.strip()]
+    relevant_sentences = []
     
-    elif any(word in question_lower for word in ['quando', 'when', 'data', 'tempo']):
-        return f"Sobre aspectos temporais relacionados a '{question}', o documento pode conter informações cronológicas. Uma análise mais detalhada seria necessária para identificar datas e períodos específicos."
+    for sentence in sentences:
+        sentence_lower = sentence.lower()
+        # Calcular relevância baseada em palavras-chave
+        relevance_score = sum(1 for keyword in question_keywords if keyword in sentence_lower)
+        
+        if relevance_score > 0:
+            relevant_sentences.append((sentence, relevance_score))
     
-    elif any(word in question_lower for word in ['onde', 'where', 'local', 'lugar']):
-        return f"Quanto à localização ou contexto geográfico da sua pergunta '{question}', o documento pode apresentar informações sobre locais e contextos espaciais relevantes."
+    # Ordenar por relevância
+    relevant_sentences.sort(key=lambda x: x[1], reverse=True)
     
-    elif any(word in question_lower for word in ['por que', 'why', 'motivo', 'razão']):
-        return f"As razões e motivações relacionadas a '{question}' podem estar explicadas no documento. O conteúdo sugere fundamentos e justificativas para os temas abordados."
+    # Análise por tipo de pergunta
+    if any(word in question_lower for word in ['o que', 'what', 'que é', 'define', 'definição', 'conceito']):
+        if relevant_sentences:
+            best_sentence = relevant_sentences[0][0]
+            return f"Com base no documento, posso responder que: {best_sentence[:200]}... Esta definição está contextualizada no documento que contém {len(context.split())} palavras sobre o tema."
+        else:
+            topics = extract_topics(context)
+            return f"O documento não contém uma definição direta para '{question}', mas aborda temas relacionados como: {', '.join(topics[:5])}. Recomendo reformular a pergunta com termos mais específicos do documento."
+    
+    elif any(word in question_lower for word in ['como', 'how', 'de que forma', 'método', 'processo']):
+        method_indicators = ['método', 'processo', 'procedimento', 'técnica', 'abordagem', 'forma', 'maneira', 'modo']
+        method_sentences = []
+        
+        for sentence in sentences:
+            if any(indicator in sentence.lower() for indicator in method_indicators):
+                method_sentences.append(sentence)
+        
+        if method_sentences:
+            return f"Sobre como realizar o que você perguntou, o documento indica: {method_sentences[0][:200]}... {f'Também menciona: {method_sentences[1][:150]}...' if len(method_sentences) > 1 else ''}"
+        elif relevant_sentences:
+            return f"Embora não haja uma metodologia explícita, o documento fornece informações relevantes: {relevant_sentences[0][0][:200]}..."
+        else:
+            return f"O documento não apresenta metodologias específicas para '{question}'. Considere buscar por termos como 'processo', 'método' ou 'procedimento' no texto."
+    
+    elif any(word in question_lower for word in ['quando', 'when', 'data', 'tempo', 'período', 'ano']):
+        # Buscar datas e referências temporais
+        date_patterns = [
+            r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b',  # DD/MM/YYYY
+            r'\b\d{4}\b',  # Anos
+            r'\b(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b',
+            r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\b'
+        ]
+        
+        temporal_info = []
+        for pattern in date_patterns:
+            matches = re.findall(pattern, context_lower)
+            temporal_info.extend(matches)
+        
+        if temporal_info:
+            return f"Sobre aspectos temporais relacionados à sua pergunta, o documento menciona: {', '.join(set(temporal_info[:5]))}. {relevant_sentences[0][0][:150] if relevant_sentences else 'Consulte o documento para mais detalhes cronológicos.'}..."
+        elif relevant_sentences:
+            return f"Embora não haja datas específicas, o documento contém informações temporais relevantes: {relevant_sentences[0][0][:200]}..."
+        else:
+            return f"O documento não apresenta informações temporais específicas sobre '{question}'. Tente buscar por anos, meses ou períodos específicos."
+    
+    elif any(word in question_lower for word in ['onde', 'where', 'local', 'lugar', 'localização', 'região']):
+        # Buscar referências geográficas
+        location_indicators = ['cidade', 'país', 'região', 'local', 'lugar', 'área', 'zona', 'território', 'estado', 'município']
+        location_sentences = []
+        
+        for sentence in sentences:
+            if any(indicator in sentence.lower() for indicator in location_indicators):
+                location_sentences.append(sentence)
+        
+        if location_sentences:
+            return f"Sobre localização, o documento indica: {location_sentences[0][:200]}... {f'Também menciona: {location_sentences[1][:150]}...' if len(location_sentences) > 1 else ''}"
+        elif relevant_sentences:
+            return f"Embora não haja referências geográficas explícitas, encontrei informações relacionadas: {relevant_sentences[0][0][:200]}..."
+        else:
+            return f"O documento não contém informações específicas de localização para '{question}'. Tente buscar por nomes de cidades, países ou regiões."
+    
+    elif any(word in question_lower for word in ['por que', 'why', 'motivo', 'razão', 'causa', 'porque']):
+        reason_indicators = ['porque', 'devido', 'razão', 'motivo', 'causa', 'consequência', 'resultado', 'efeito']
+        reason_sentences = []
+        
+        for sentence in sentences:
+            if any(indicator in sentence.lower() for indicator in reason_indicators):
+                reason_sentences.append(sentence)
+        
+        if reason_sentences:
+            return f"Sobre as razões relacionadas à sua pergunta, o documento explica: {reason_sentences[0][:200]}... {f'Adicionalmente: {reason_sentences[1][:150]}...' if len(reason_sentences) > 1 else ''}"
+        elif relevant_sentences:
+            return f"Embora não haja explicações causais diretas, o documento fornece contexto relevante: {relevant_sentences[0][0][:200]}..."
+        else:
+            return f"O documento não apresenta justificativas específicas para '{question}'. Procure por termos como 'porque', 'devido a' ou 'razão'."
+    
+    elif any(word in question_lower for word in ['quantos', 'quanto', 'how many', 'how much', 'número', 'quantidade']):
+        # Buscar números e quantidades
+        number_patterns = [
+            r'\b\d+[.,]?\d*\s*%\b',  # Percentuais
+            r'\b\d+[.,]?\d*\s*(mil|milhão|bilhão|thousand|million|billion)\b',  # Números grandes
+            r'\b\d+[.,]?\d*\b'  # Números gerais
+        ]
+        
+        numbers = []
+        for pattern in number_patterns:
+            matches = re.findall(pattern, context)
+            numbers.extend(matches)
+        
+        if numbers:
+            return f"Sobre quantidades relacionadas à sua pergunta, o documento menciona: {', '.join(set(numbers[:5]))}. {relevant_sentences[0][0][:150] if relevant_sentences else 'Consulte o documento para mais detalhes numéricos.'}..."
+        elif relevant_sentences:
+            return f"Embora não haja números específicos, encontrei informações quantitativas relevantes: {relevant_sentences[0][0][:200]}..."
+        else:
+            return f"O documento não apresenta dados quantitativos específicos sobre '{question}'. Tente buscar por números, percentuais ou estatísticas."
     
     else:
-        return f"Sua pergunta '{question}' é interessante. Com base no documento analisado, posso identificar conteúdo relacionado que pode fornecer insights relevantes. Para uma resposta mais precisa, recomendo reformular a pergunta de forma mais específica."
+        # Resposta genérica baseada em relevância
+        if relevant_sentences:
+            top_sentences = [s[0] for s in relevant_sentences[:3]]
+            response = f"Com base no documento, posso fornecer as seguintes informações sobre '{question}': "
+            response += f"{top_sentences[0][:150]}..."
+            
+            if len(top_sentences) > 1:
+                response += f" Adicionalmente: {top_sentences[1][:100]}..."
+            
+            return response
+        else:
+            # Sugerir tópicos relacionados
+            topics = extract_topics(context)
+            return f"Não encontrei informações diretas sobre '{question}' no documento. No entanto, o texto aborda temas como: {', '.join(topics[:5])}. Tente reformular sua pergunta usando estes termos ou seja mais específico."
 
 
 # ============================================================
