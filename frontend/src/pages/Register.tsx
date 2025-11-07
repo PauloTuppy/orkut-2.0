@@ -30,7 +30,8 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/register', {
+      // Usar proxy do Vite em vez de URL direta
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,14 +40,22 @@ export default function Register() {
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao criar conta');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Erro ao criar conta');
       }
 
       const data = await response.json();
+      
+      // Salvar token
       localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user_email', email);
+      localStorage.setItem('user_name', name);
+      
+      // Navegar para dashboard
       setTimeout(() => navigate('/'), 500);
     } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta');
+      console.error('Register error:', err);
+      setError(err.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }

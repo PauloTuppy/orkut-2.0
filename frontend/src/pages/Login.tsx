@@ -18,7 +18,8 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      // Usar proxy do Vite em vez de URL direta
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,17 +28,24 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        throw new Error('Email ou senha inválidos');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Email ou senha inválidos');
       }
 
       const data = await response.json();
+      
+      // Salvar token
       localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user_email', email);
       
       // Efeito de sucesso
       setError('');
+      
+      // Navegar para dashboard
       setTimeout(() => navigate('/'), 500);
     } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login');
+      console.error('Login error:', err);
+      setError(err.message || 'Erro ao fazer login. Verifique suas credenciais.');
     } finally {
       setIsLoading(false);
     }
